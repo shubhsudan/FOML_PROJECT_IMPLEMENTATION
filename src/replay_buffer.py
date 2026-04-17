@@ -4,9 +4,9 @@ replay_buffer.py — Circular experience replay buffer for SAC.
 Stores (obs, action, reward, next_obs, done) tuples as float32 numpy arrays
 and returns batches as torch tensors on the target device.
 
-Dimensions (from config):
-    obs_dim = 1 + NUM_MARKETS + EMBED_DIM = 1 + 7 + 64 = 72
-    act_dim = 6
+Dimensions (ERCOT-correct, from config):
+    obs_dim = STATE_DIM  = 72  (SoC + prices(5) + TTFE(64) + hour_sin_cos(2))
+    act_dim = ACTION_DIM =  8  (v_dch/v_ch + spot_dch/ch + regup/regdn + rrs + nsrs)
 """
 
 import numpy as np
@@ -14,7 +14,7 @@ import torch
 import sys
 import os
 sys.path.insert(0, os.path.dirname(__file__))
-from config import EMBED_DIM, NUM_MARKETS
+from config import STATE_DIM, ACTION_DIM
 
 
 class ReplayBuffer:
@@ -26,16 +26,16 @@ class ReplayBuffer:
 
     Args:
         capacity  : maximum number of transitions to store
-        obs_dim   : dimension of the observation vector (default 72)
-        act_dim   : dimension of the action vector (default 6)
+        obs_dim   : dimension of the observation vector (default STATE_DIM=72)
+        act_dim   : dimension of the action vector    (default ACTION_DIM=8)
         device    : torch.device — where sampled tensors will be placed
     """
 
     def __init__(
         self,
         capacity: int,
-        obs_dim: int = 1 + NUM_MARKETS + EMBED_DIM,
-        act_dim: int = 6,
+        obs_dim: int = STATE_DIM,
+        act_dim: int = ACTION_DIM,
         device: torch.device = torch.device("cpu"),
     ):
         self.capacity = capacity

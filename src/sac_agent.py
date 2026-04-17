@@ -7,12 +7,12 @@ Implements Section IV-C of Li et al. (2024):
   - Automatic entropy tuning via learnable log_alpha
   - Gradient clipping (max_norm=1.0) on all networks
 
-Observation vector layout (pre-computed outside this module):
-    obs = [SoC (1,) | raw_prices (7,) | ttfe_feature (64,)]  →  dim = 72
+Observation vector layout (72-dim, ERCOT-correct):
+    obs = [SoC(1) | prices(5) | ttfe_feature(64) | hour_sin_cos(2)]
 
-Action space:
-    6-dim continuous in [-1, 1] (tanh squashed), mapped to physical BESS
-    decisions by the environment's map_action() method.
+Action space (8-dim, ERCOT-correct):
+    [v_dch, v_ch, a_spot_dch, a_spot_ch, a_regup, a_regdn, a_rrs, a_nsrs]
+    Continuous in [-1, 1] (tanh squashed).
 """
 
 import numpy as np
@@ -24,16 +24,15 @@ import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
 from config import (
-    EMBED_DIM, NUM_MARKETS,
     HIDDEN_DIM, NUM_HIDDEN_LAYERS,
-    LR_POLICY, LR_VALUE, LR_Q,
-    GAMMA, TAU_TARGET, ALPHA_ENTROPY,
-    BATCH_SIZE,
+    LR_POLICY, LR_Q,
+    GAMMA, TAU_TARGET, ALPHA_ENTROPY, TARGET_ENTROPY,
+    BATCH_SIZE, STATE_DIM, ACTION_DIM,
 )
 
-# Fixed observation and action dimensions
-OBS_DIM = 1 + NUM_MARKETS + EMBED_DIM   # 72
-ACT_DIM = 6
+# Fixed observation and action dimensions (ERCOT-correct)
+OBS_DIM = STATE_DIM    # 72: SoC(1) + prices(5) + TTFE(64) + hour_sin_cos(2)
+ACT_DIM = ACTION_DIM   # 8:  v_dch/v_ch + spot_dch/ch + regup/regdn + rrs + nsrs
 
 # Small constant for numerical stability in log computations
 LOG_STD_MIN = -20
@@ -164,6 +163,11 @@ class Actor(nn.Module):
 
         return action, log_pi
 
+    def get_mean_action(self, obs: torch.Tensor) -> torch.Tensor:
+        """Deterministic action for evaluation: tanh(mean), no noise."""
+        mean, _ = self.forward(obs)
+        return torch.tanh(mean)
+
 
 # ─── Critic ───────────────────────────────────────────────────────────────────
 
@@ -253,8 +257,8 @@ class SACAgent:
             p.requires_grad_(False)
 
         # ── Entropy tuning ────────────────────────────────────────────────────
-        # Target entropy = -|A| * 0.5  (tighter than default to prevent alpha drift)
-        self.target_entropy = -float(act_dim) * 0.5
+        # TARGET_ENTROPY = -ACTION_DIM * 0.5 = -4.0  (tighter than default)
+        self.target_entropy = TARGET_ENTROPY
         self.log_alpha = torch.tensor(
             np.log(alpha_init), dtype=torch.float32,
             device=device, requires_grad=True

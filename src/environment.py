@@ -1,292 +1,281 @@
 """
-environment.py — BESS joint-bidding MDP environment.
+environment.py — ERCOT-correct BESS joint-market bidding environment.
 
-Implements the MDP described in Section IV-B of the paper:
-  - State space S  (eq. 22):  [SoC_{t-1}, ρ_{t-1}, f_{t-1}]
-  - Action space A (eq. 23):  [v^dch, v^ch, a^S, a^fast, a^slow, a^delay]
-  - Reward R        (eq. 30):  r_t = r^S_t + r^fast_t + r^slow_t + r^delay_t
-  - Constraints     (eq. 1-11): power limits, SoC limits
+Market structure: ERCOT 2022
+  - 5 markets: spot energy + RegUp + RegDn + RRS + NSRS
+  - ECRS excluded (not active until June 2023; all-zero in 2022 data)
+  - AS revenue = capacity payment: price ($/MW) × MW_bid × dt_h
+  - Hourly SOC floor/ceiling rule (ERCOT BPM Dec 2022 / NPRR 1186)
+  - No simultaneous RegUp + RegDn
+  - Duration-based AS qualification (5-hr BESS qualifies for full rated power)
 
-NOTE: The TTFE feature vector f_{t-1} is passed IN from outside;
-      this environment does NOT instantiate TTFE — that is the caller's job.
-      This keeps environment and model cleanly decoupled.
+Action space (8-dim, tanh output from actor):
+  [v_dch, v_ch, a_spot_dch, a_spot_ch, a_regup, a_regdn, a_rrs, a_nsrs]
+
+State space (72-dim):
+  [SoC(1), spot(1), RegUp(1), RegDn(1), RRS(1), NSRS(1), TTFE(64), hour_sin(1), hour_cos(1)]
 """
 
 import numpy as np
-from dataclasses import dataclass, field
-from typing import Tuple, Optional
-import sys, os
+import sys
+import os
+
 sys.path.insert(0, os.path.dirname(__file__))
 from config import (
-    BESS_CAPACITY_MWH, BESS_RATED_POWER_MW, BESS_FCAS_MAX_MW,
-    BESS_EFF_CH, BESS_EFF_DCH, BESS_E_MIN_MWH, BESS_E_MAX_MWH,
-    BESS_DEGRADATION_C, DISPATCH_INTERVAL_MIN, TAU_EMA, BETA_S,
-    PENALTY_VIOLATE, NUM_MARKETS, EMBED_DIM
+    CAPACITY_MWH, RATED_POWER_MW, FCAS_MAX_MW,
+    EFF_CH, EFF_DCH, E_MIN_MWH, E_MAX_MWH, E_INIT_MWH,
+    DEGRADATION_C, DT_H, TIMESTEPS_PER_DAY,
+    TAU_EMA, BETA_S, PENALTY_VIOLATE,
+    NUM_MARKETS, STATE_DIM, ACTION_DIM,
+    AS_DURATION_H,
 )
 
 
-@dataclass
-class BESSParams:
-    """Physical parameters of the BESS."""
-    capacity_mwh    : float = BESS_CAPACITY_MWH
-    rated_power_mw  : float = BESS_RATED_POWER_MW
-    fcas_max_mw     : float = BESS_FCAS_MAX_MW
-    eff_ch          : float = BESS_EFF_CH
-    eff_dch         : float = BESS_EFF_DCH
-    e_min_mwh       : float = BESS_E_MIN_MWH
-    e_max_mwh       : float = BESS_E_MAX_MWH
-    degradation_c   : float = BESS_DEGRADATION_C
-    dt_h            : float = DISPATCH_INTERVAL_MIN / 60.0  # hours per step
+# ── Action Decoder ────────────────────────────────────────────────────────────
 
+def decode_action(raw_action: np.ndarray) -> tuple:
+    """
+    Maps actor tanh output [-1,1]^8 → physical ERCOT-compliant MW bids.
+
+    Input layout:
+        0: v_dch      discharge mode flag
+        1: v_ch       charge mode flag
+        2: a_spot_dch spot discharge power
+        3: a_spot_ch  spot charge power
+        4: a_regup    RegUp bid  (discharge-direction AS)
+        5: a_regdn    RegDn bid  (charge-direction AS)
+        6: a_rrs      RRS bid   (discharge-direction AS)
+        7: a_nsrs     NSRS bid  (discharge-direction AS)
+
+    Returns:
+        (v_dch, v_ch, p_spot_dch, p_spot_ch, p_regup, p_regdn, p_rrs, p_nsrs)
+        all in MW
+    """
+    v_dch = 1 if raw_action[0] > 0 else 0
+    v_ch  = 1 if raw_action[1] > 0 else 0
+
+    # Mutual exclusivity
+    if v_dch == 1 and v_ch == 1:
+        if raw_action[0] >= raw_action[1]:
+            v_ch = 0
+        else:
+            v_dch = 0
+
+    def scale(x, limit):
+        return float(np.clip((x + 1.0) / 2.0, 0.0, 1.0) * limit)
+
+    p_spot_dch = scale(raw_action[2], RATED_POWER_MW) if v_dch else 0.0
+    p_spot_ch  = scale(raw_action[3], RATED_POWER_MW) if v_ch  else 0.0
+    p_regup    = scale(raw_action[4], FCAS_MAX_MW)    if v_dch else 0.0
+    p_rrs      = scale(raw_action[6], FCAS_MAX_MW)    if v_dch else 0.0
+    p_nsrs     = scale(raw_action[7], FCAS_MAX_MW)    if v_dch else 0.0
+    p_regdn    = scale(raw_action[5], FCAS_MAX_MW)    if v_ch  else 0.0
+
+    # ERCOT Rule: No simultaneous RegUp + RegDn
+    if p_regup > 0 and p_regdn > 0:
+        if p_regup >= p_regdn:
+            p_regdn = 0.0
+        else:
+            p_regup = 0.0
+
+    # Total discharge power <= Pmax
+    dch_total = p_spot_dch + p_regup + p_rrs + p_nsrs
+    if dch_total > RATED_POWER_MW:
+        s = RATED_POWER_MW / dch_total
+        p_spot_dch *= s; p_regup *= s; p_rrs *= s; p_nsrs *= s
+
+    # Total charge power <= Pmax
+    ch_total = p_spot_ch + p_regdn
+    if ch_total > RATED_POWER_MW:
+        s = RATED_POWER_MW / ch_total
+        p_spot_ch *= s; p_regdn *= s
+
+    return (v_dch, v_ch, p_spot_dch, p_spot_ch, p_regup, p_regdn, p_rrs, p_nsrs)
+
+
+# ── Revenue Formulas (ERCOT-correct) ─────────────────────────────────────────
+
+def compute_step_revenue(v_dch, v_ch,
+                         p_spot_dch, p_spot_ch,
+                         p_regup, p_regdn, p_rrs, p_nsrs,
+                         prices_5: np.ndarray) -> dict:
+    """
+    Real USD revenue for one 5-minute ERCOT dispatch interval.
+
+    prices_5: [rt_lmp, regup_price, regdn_price, rrs_price, nsrs_price]
+    AS prices are $/MW capacity prices (paid for reservation, not delivery).
+    Revenue = price × MW_bid × dt_h
+    """
+    rt_lmp, px_regup, px_regdn, px_rrs, px_nsrs = prices_5
+
+    r_spot = DT_H * (EFF_DCH * rt_lmp * p_spot_dch
+                     - (1.0 / EFF_CH) * rt_lmp * p_spot_ch)
+    r_regup = px_regup * p_regup * DT_H
+    r_regdn = px_regdn * p_regdn * DT_H
+    r_rrs   = px_rrs   * p_rrs   * DT_H
+    r_nsrs  = px_nsrs  * p_nsrs  * DT_H
+    r_as    = r_regup + r_regdn + r_rrs + r_nsrs
+
+    total_dch = p_spot_dch + p_regup + p_rrs + p_nsrs
+    r_deg = DEGRADATION_C * DT_H * v_dch * total_dch
+
+    total = r_spot + r_as - r_deg
+    return {
+        "total": total, "r_spot": r_spot, "r_as": r_as,
+        "r_regup": r_regup, "r_regdn": r_regdn,
+        "r_rrs": r_rrs, "r_nsrs": r_nsrs, "r_deg": r_deg,
+    }
+
+
+# ── ERCOT Hourly SOC Rule ─────────────────────────────────────────────────────
+
+def get_effective_soc_bounds(timestep: int,
+                              p_regup: float, p_regdn: float,
+                              p_rrs: float, p_nsrs: float) -> tuple:
+    """
+    Returns (e_min_eff, e_max_eff) enforcing ERCOT hourly SOC rule.
+    Applied at hour start (every 12 timesteps). Standard bounds otherwise.
+    """
+    if timestep % 12 != 0:
+        return E_MIN_MWH, E_MAX_MWH
+
+    e_reserved = (p_regup * AS_DURATION_H["RegUp"]
+                 + p_rrs   * AS_DURATION_H["RRS"]
+                 + p_nsrs  * AS_DURATION_H["NSRS"])
+    e_min_eff  = min(E_MAX_MWH, E_MIN_MWH + e_reserved)
+    e_headroom = p_regdn * AS_DURATION_H["RegDn"]
+    e_max_eff  = max(E_MIN_MWH, E_MAX_MWH - e_headroom)
+    return e_min_eff, e_max_eff
+
+
+# ── Shaped RL Reward (training only) ─────────────────────────────────────────
+
+def compute_shaped_reward(v_dch, v_ch,
+                          p_spot_dch, p_spot_ch,
+                          p_regup, p_regdn, p_rrs, p_nsrs,
+                          prices_5: np.ndarray,
+                          ema_spot: float,
+                          violated: bool) -> float:
+    """Shaped RL reward for training. NOT used for evaluation."""
+    rev    = compute_step_revenue(v_dch, v_ch, p_spot_dch, p_spot_ch,
+                                  p_regup, p_regdn, p_rrs, p_nsrs, prices_5)
+    rt_lmp = float(prices_5[0])
+    I_ch   = 1 if rt_lmp < ema_spot else 0
+    I_dch  = 1 if rt_lmp > ema_spot else 0
+    r_shape = (BETA_S * (p_spot_dch + p_spot_ch) * abs(rt_lmp - ema_spot)
+               * (I_dch * v_dch * EFF_DCH + I_ch * v_ch / EFF_CH))
+    reward = rev["total"] + r_shape
+    if violated:
+        reward -= PENALTY_VIOLATE
+    return float(reward)
+
+
+# ── Main Environment Class ────────────────────────────────────────────────────
 
 class BESSEnvironment:
     """
-    Joint-market BESS bidding environment.
-
-    Observation: np.ndarray  shape (1 + 7 + EMBED_DIM,)
-        [SoC, spot, FR, FL, SR, SL, DR, DL, f_1, ..., f_{F'}]
-
-    Action: np.ndarray  shape (6,) — raw network output in [-1, 1]
-        Network output is mapped to physical actions:
-        [v_dch ∈ {0,1}, v_ch ∈ {0,1}, a^S ∈ [0,1],
-         a^fast ∈ [0, P^FCAS_max/P_max],
-         a^slow ∈ [0, P^FCAS_max/P_max],
-         a^delay ∈ [0, P^FCAS_max/P_max]]
-
-    Returns: (next_obs, reward, done, info)
+    ERCOT-correct BESS joint-bidding environment.
+    One episode = one trading day = 288 timesteps × 5 minutes.
+    mode: "joint" | "spot" | "as"
     """
 
-    def __init__(
-        self,
-        price_episode: np.ndarray,          # (T, 7)  — one day of prices (raw, not scaled)
-        feature_dim: int = EMBED_DIM,
-        params: BESSParams = None,
-        mode: str = "joint",                # "spot", "fcas", or "joint"
-    ):
-        assert price_episode.ndim == 2 and price_episode.shape[1] == NUM_MARKETS
-        self.prices    = price_episode       # (T, 7)
-        self.T         = price_episode.shape[0]
-        self.feat_dim  = feature_dim
-        self.p         = params or BESSParams()
-        self.mode      = mode
+    def __init__(self, mode: str = "joint"):
+        assert mode in ("joint", "spot", "as")
+        self.mode     = mode
+        self.t        = 0
+        self.energy   = E_INIT_MWH
+        self.ema_spot = 0.0
+        self.done     = False
+        self._ep_raw  = None
+        self._ep_feat = None
 
-        self.obs_dim   = 1 + NUM_MARKETS + feature_dim   # SoC + ρ + f
-        self.act_dim   = 6                               # eq. 23
-
-        self._reset_state()
-
-    # ─── Reset ────────────────────────────────────────────────────────────────
-
-    def _reset_state(self):
-        """Reset to start of episode."""
-        self.t      = 0
-        self.energy = self.p.capacity_mwh * 0.5         # start at 50% SoC
-        self.ema_spot = self.prices[0, 0]                # EMA of spot price
-        self.done   = False
-
-    def reset(
-        self,
-        price_episode: np.ndarray = None,
-        init_feature: np.ndarray = None,
-    ) -> np.ndarray:
+    def reset(self, price_episode_raw: np.ndarray,
+              features: np.ndarray) -> np.ndarray:
         """
-        Reset environment, optionally with a new price episode.
-        Returns initial observation.
+        Reset for a new episode.
+        price_episode_raw: (288, 5) raw prices [spot, RegUp, RegDn, RRS, NSRS]
+        features:          (288, 64) pre-computed TTFE features
         """
-        if price_episode is not None:
-            self.prices = price_episode
-            self.T      = price_episode.shape[0]
-        self._reset_state()
-        feat = init_feature if init_feature is not None else np.zeros(self.feat_dim, dtype=np.float32)
-        return self._make_obs(feat)
+        assert price_episode_raw.shape == (TIMESTEPS_PER_DAY, NUM_MARKETS)
+        assert features.shape          == (TIMESTEPS_PER_DAY, 64)
+        self._ep_raw  = price_episode_raw
+        self._ep_feat = features
+        self.t        = 0
+        self.energy   = E_INIT_MWH
+        self.ema_spot = float(price_episode_raw[0, 0])
+        self.done     = False
+        return self._make_obs()
 
-    # ─── Observation ──────────────────────────────────────────────────────────
+    def _make_obs(self) -> np.ndarray:
+        from data_loader import build_state
+        return build_state(
+            self.energy / CAPACITY_MWH,
+            self._ep_raw[self.t],
+            self._ep_feat[self.t],
+            self.t,
+        )
 
-    def _make_obs(self, feature_vec: np.ndarray) -> np.ndarray:
-        """
-        Constructs state s_t = [SoC_{t-1}, ρ_{t-1}, f_{t-1}]  (eq. 22)
-        using CURRENT internal state (before the step).
-        """
-        soc = np.array([self.energy / self.p.capacity_mwh], dtype=np.float32)
-        t_idx = min(self.t, self.T - 1)
-        rho = self.prices[t_idx].astype(np.float32)             # (7,)
-        f   = feature_vec.astype(np.float32)                    # (EMBED_DIM,)
-        return np.concatenate([soc, rho, f])                    # (8 + EMBED_DIM,)
-
-    # ─── Action mapping ───────────────────────────────────────────────────────
-
-    @staticmethod
-    def map_action(raw_action: np.ndarray, p: BESSParams) -> Tuple:
-        """
-        Maps raw network output ∈ [-1,1]^6 to physical BESS decisions.
-
-        raw_action indices:
-          0 → v_dch  (discharge flag)
-          1 → v_ch   (charge flag)
-          2 → a^S    (spot bid, normalised by Pmax)
-          3 → a^fast (fast FCAS bid, normalised by Pmax)
-          4 → a^slow (slow FCAS bid, normalised by Pmax)
-          5 → a^delay(delayed FCAS bid, normalised by Pmax)
-
-        Returns: (v_dch, v_ch, a_S_mw, a_fast_mw, a_slow_mw, a_delay_mw)
-        """
-        # Continuous → binary flags via threshold at 0
-        v_dch = 1 if raw_action[0] > 0 else 0
-        v_ch  = 1 if raw_action[1] > 0 else 0
-
-        # Enforce mutual exclusivity (eq. 1): cannot charge AND discharge
-        if v_dch == 1 and v_ch == 1:
-            # Keep whichever has stronger signal
-            if raw_action[0] >= raw_action[1]:
-                v_ch = 0
-            else:
-                v_dch = 0
-
-        # Map continuous bids from [-1,1] to [0, Pmax] — tanh output
-        fcas_max_norm = p.fcas_max_mw / p.rated_power_mw   # ≤ 1.0
-
-        a_S_norm     = np.clip((raw_action[2] + 1) / 2, 0, 1)          # [0,1]
-        a_fast_norm  = np.clip((raw_action[3] + 1) / 2, 0, fcas_max_norm)
-        a_slow_norm  = np.clip((raw_action[4] + 1) / 2, 0, fcas_max_norm)
-        a_delay_norm = np.clip((raw_action[5] + 1) / 2, 0, fcas_max_norm)
-
-        # Enforce total bid ≤ Pmax (eq. 8) by clipping sum
-        total_norm = a_S_norm + a_fast_norm + a_slow_norm + a_delay_norm
-        if total_norm > 1.0:
-            scale = 1.0 / total_norm
-            a_S_norm     *= scale
-            a_fast_norm  *= scale
-            a_slow_norm  *= scale
-            a_delay_norm *= scale
-
-        # Convert to MW
-        a_S_mw     = a_S_norm     * p.rated_power_mw
-        a_fast_mw  = a_fast_norm  * p.rated_power_mw
-        a_slow_mw  = a_slow_norm  * p.rated_power_mw
-        a_delay_mw = a_delay_norm * p.rated_power_mw
-
-        return v_dch, v_ch, a_S_mw, a_fast_mw, a_slow_mw, a_delay_mw
-
-    # ─── Step ─────────────────────────────────────────────────────────────────
-
-    def step(
-        self,
-        raw_action: np.ndarray,
-        next_feature: np.ndarray,
-    ) -> Tuple[np.ndarray, float, bool, dict]:
+    def step(self, raw_action: np.ndarray) -> tuple:
         """
         Execute one 5-minute dispatch step.
-
-        Args:
-            raw_action:    (6,) from actor network, values in [-1, 1]
-            next_feature:  (EMBED_DIM,) TTFE output for NEXT observation
-
-        Returns:
-            next_obs  : (obs_dim,)
-            reward    : float
-            done      : bool
-            info      : dict with breakdown of revenue components
+        raw_action: (8,) tanh outputs from actor
+        Returns: (next_obs, shaped_reward, done, info)
         """
-        assert not self.done, "Episode finished — call reset() first."
+        assert not self.done
 
-        p = self.p
-        rho = self.prices[self.t]           # [spot, FR, FL, SR, SL, DR, DL]
-        spot, FR, FL, SR, SL, DR, DL = rho
+        prices = self._ep_raw[self.t]
+        rt_lmp = float(prices[0])
+        self.ema_spot = TAU_EMA * self.ema_spot + (1.0 - TAU_EMA) * rt_lmp
 
-        # ── Map action ────────────────────────────────────────────────────────
-        v_dch, v_ch, a_S, a_fast, a_slow, a_delay = self.map_action(raw_action, p)
+        (v_dch, v_ch,
+         p_spot_dch, p_spot_ch,
+         p_regup, p_regdn,
+         p_rrs, p_nsrs) = decode_action(raw_action)
 
-        # ── Update EMA spot price baseline  (eq. 25) ─────────────────────────
-        tau = TAU_EMA
-        self.ema_spot = tau * self.ema_spot + (1 - tau) * spot
+        if self.mode == "spot":
+            p_regup = p_regdn = p_rrs = p_nsrs = 0.0
+        elif self.mode == "as":
+            p_spot_dch = p_spot_ch = 0.0
 
-        # ── Compute energy change (eq. 10, 11) ───────────────────────────────
-        # Spot market energy change
-        delta_e_spot = p.dt_h * (v_ch - v_dch) * a_S          # MWh
-
-        # FCAS: only dispatched on contingency event
-        # Simulate contingency with low probability (paper: stochastic)
-        contingency_raise = 1 if (np.random.rand() < 0.01) else 0
-        contingency_lower = 1 if (np.random.rand() < 0.01) else 0
-
-        dt_fast  = 6   / 3600   # 6 seconds in hours
-        dt_slow  = 60  / 3600   # 60 seconds
-        dt_delay = 300 / 3600   # 5 minutes
-
-        delta_e_fcas = (v_ch - v_dch) * (contingency_raise + contingency_lower) * (
-            dt_fast * a_fast + dt_slow * a_slow + dt_delay * a_delay
+        e_min_eff, e_max_eff = get_effective_soc_bounds(
+            self.t, p_regup, p_regdn, p_rrs, p_nsrs
         )
 
-        delta_e = delta_e_spot + delta_e_fcas
-
-        # ── Check SoC limits (eq. 9) ──────────────────────────────────────────
+        delta_e    = DT_H * (EFF_CH * p_spot_ch - (1.0 / EFF_DCH) * p_spot_dch)
         new_energy = self.energy + delta_e
-        violated   = (new_energy < p.e_min_mwh) or (new_energy > p.e_max_mwh)
+        violated   = (new_energy < e_min_eff) or (new_energy > e_max_eff)
 
         if violated:
-            # Clip to valid range (paper also clips as safety net)
-            new_energy = np.clip(new_energy, p.e_min_mwh, p.e_max_mwh)
-            # Zero out the offending bids
-            a_S = a_fast = a_slow = a_delay = 0.0
+            new_energy = np.clip(new_energy, e_min_eff, e_max_eff)
+            p_spot_dch = p_spot_ch = 0.0
+            p_regup = p_regdn = p_rrs = p_nsrs = 0.0
             v_dch = v_ch = 0
 
-        self.energy = new_energy
+        self.energy = float(new_energy)
 
-        # ── Compute reward (eq. 26–30) ────────────────────────────────────────
-
-        # Spot market reward (eq. 26)
-        I_ch  = 1 if spot < self.ema_spot else 0
-        I_dch = 1 if spot > self.ema_spot else 0
-
-        r_spot = (
-            a_S * spot * (v_dch * p.eff_dch - v_ch / p.eff_ch)          # revenue term
-            + BETA_S * a_S * abs(spot - self.ema_spot)                   # shaping term
-            * (I_dch * v_dch * p.eff_dch + I_ch * v_ch / p.eff_ch)
+        reward = compute_shaped_reward(
+            v_dch, v_ch, p_spot_dch, p_spot_ch,
+            p_regup, p_regdn, p_rrs, p_nsrs,
+            prices, self.ema_spot, violated,
         )
 
-        # FCAS rewards (eq. 27–29)
-        r_fast  = a_fast  * (v_dch * p.eff_dch * FR + v_ch / p.eff_ch * FL)
-        r_slow  = a_slow  * (v_dch * p.eff_dch * SR + v_ch / p.eff_ch * SL)
-        r_delay = a_delay * (v_dch * p.eff_dch * DR + v_ch / p.eff_ch * DL)
-
-        # Scale rewards by dispatch interval (Δt in hours)
-        r_spot  *= p.dt_h
-        r_fast  *= p.dt_h
-        r_slow  *= p.dt_h
-        r_delay *= p.dt_h
-
-        # Degradation cost (objective eq. 4)
-        deg_cost = p.degradation_c * p.dt_h * v_dch * (a_S + a_fast + a_slow + a_delay)
-
-        # Mode selector: zero out unwanted markets
-        if self.mode == "spot":
-            r_fast = r_slow = r_delay = 0.0
-        elif self.mode == "fcas":
-            r_spot = 0.0
-
-        # Total reward (eq. 30) minus degradation
-        reward = r_spot + r_fast + r_slow + r_delay - deg_cost
-
-        # SoC violation penalty
-        if violated:
-            reward -= PENALTY_VIOLATE
-
-        # ── Advance timestep ──────────────────────────────────────────────────
-        self.t += 1
-        self.done = (self.t >= self.T)
-
-        next_obs = self._make_obs(next_feature)
+        rev = compute_step_revenue(
+            v_dch, v_ch, p_spot_dch, p_spot_ch,
+            p_regup, p_regdn, p_rrs, p_nsrs, prices,
+        )
 
         info = {
-            "r_spot"   : r_spot,
-            "r_fast"   : r_fast,
-            "r_slow"   : r_slow,
-            "r_delay"  : r_delay,
-            "deg_cost" : deg_cost,
-            "violated" : violated,
-            "soc"      : self.energy / p.capacity_mwh,
-            "v_dch"    : v_dch,
-            "v_ch"     : v_ch,
+            "usd_revenue": rev["total"],
+            "r_spot":  rev["r_spot"],  "r_as":    rev["r_as"],
+            "r_regup": rev["r_regup"], "r_regdn": rev["r_regdn"],
+            "r_rrs":   rev["r_rrs"],   "r_nsrs":  rev["r_nsrs"],
+            "r_deg":   rev["r_deg"],
+            "soc":     self.energy / CAPACITY_MWH,
+            "violated": violated,
+            "v_dch": v_dch, "v_ch": v_ch,
         }
 
+        self.t   += 1
+        self.done = (self.t >= TIMESTEPS_PER_DAY)
+        next_obs  = self._make_obs() if not self.done else np.zeros(STATE_DIM, dtype=np.float32)
         return next_obs, reward, self.done, info

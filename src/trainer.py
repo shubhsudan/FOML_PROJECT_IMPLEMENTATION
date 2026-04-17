@@ -34,6 +34,7 @@ from config import (
     EMBED_DIM, NUM_MARKETS, TEMPORAL_SEG_LEN,
     REPLAY_BUFFER_SIZE, BATCH_SIZE,
     TIMESTEPS_PER_DAY, ALPHA_ENTROPY, LR_POLICY,
+    REWARD_CLIP, CAPACITY_MWH,
 )
 from data_loader import load_all, iter_daily_episodes
 from environment import BESSEnvironment
@@ -155,36 +156,32 @@ def run_episode(
     all_segs = np.stack(
         [build_temporal_segment(scaled_prices, t, L=TEMPORAL_SEG_LEN) for t in range(T)],
         axis=0,
-    )  # (T, L, 7)
-    seg_tensor = torch.from_numpy(all_segs).to(device)  # (T, L, 7)
+    )  # (T, L, NUM_MARKETS)
+    seg_tensor = torch.from_numpy(all_segs).to(device)
     ttfe.eval()
     with torch.no_grad():
-        all_feats = ttfe(seg_tensor).cpu().numpy()  # (T, F')
+        all_feats = ttfe(seg_tensor).cpu().numpy()  # (T, EMBED_DIM)
 
-    obs = env.reset(price_episode=raw_prices, init_feature=all_feats[0])
+    obs = env.reset(price_episode_raw=raw_prices, features=all_feats)
 
     total_reward  = 0.0
     n_violations  = 0
-    soc_values    = [env.energy / env.p.capacity_mwh]
+    soc_values    = [env.energy / CAPACITY_MWH]
     step_count    = 0
 
     for t in range(T):
         # Select action
         if (not deterministic) and (total_steps + t < warmup_steps):
-            # Uniformly random action in [-1, 1] during warmup
             action = np.random.uniform(-1.0, 1.0, size=(agent.act_dim,)).astype(np.float32)
         else:
             action = agent.select_action(obs, deterministic=deterministic)
 
-        # Next TTFE feature (already pre-computed)
-        next_feat = all_feats[min(t + 1, T - 1)]
-
-        # Step environment
-        next_obs, reward, done, info = env.step(action, next_feat)
+        # Step environment (new API: takes only raw_action)
+        next_obs, reward, done, info = env.step(action)
 
         # Store transition in replay buffer (skip during eval)
         if buffer is not None:
-            reward_clipped = float(np.clip(reward, -500.0, 500.0))
+            reward_clipped = float(np.clip(reward, -REWARD_CLIP, REWARD_CLIP))
             buffer.push(obs, action, reward_clipped, next_obs, float(done))
 
         total_reward += reward
@@ -352,10 +349,7 @@ def train(
 
     # ── Environment (reused across episodes via reset()) ──────────────────────
     # Initialise with the first training episode as a placeholder
-    env = BESSEnvironment(
-        price_episode=train_raw_episodes[0],
-        mode="joint",
-    )
+    env = BESSEnvironment(mode="joint")
 
     # ── CSV loggers ───────────────────────────────────────────────────────────
     train_logger = CSVLogger(

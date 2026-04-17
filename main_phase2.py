@@ -1,8 +1,11 @@
 """
-main_phase2.py — Entry point for Phase 2: SAC training of TempDRL BESS agent.
+main_phase2.py — Entry point for TempDRL SAC training (ERCOT-correct).
 
-Usage:
-    python main_phase2.py
+ERCOT 2022 implementation:
+  - 5 markets: spot + RegUp + RegDn + RRS + NSRS
+  - 8-dim action space
+  - 72-dim state space (SoC + prices + TTFE + hour_sin_cos)
+  - TTFE saved in every checkpoint
 
 Hardware target:
     NVIDIA A16, CUDA 12.4, GPU index 26
@@ -11,39 +14,33 @@ Hardware target:
 import sys
 import os
 
-# Ensure src/ is on the import path regardless of working directory
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "src"))
 
 import torch
 from src.trainer import train
+from src.config import (
+    BATCH_SIZE, STATE_DIM, ACTION_DIM, NUM_MARKETS,
+    CKPT_DIR, LOG_DIR,
+)
 
 
-def _print_banner(
-    gpu_id:       int,
-    num_episodes: int,
-    eval_every:   int,
-    warmup_steps: int,
-    batch_size:   int,
-    save_dir:     str,
-    log_dir:      str,
-) -> None:
-    """Print a concise startup banner with key configuration."""
+def _print_banner(gpu_id, num_episodes, eval_every, warmup_steps,
+                  batch_size, save_dir, log_dir):
     if torch.cuda.is_available():
-        device_str = f"cuda:{gpu_id}"
-        try:
-            device_name = torch.cuda.get_device_name(gpu_id)
-        except Exception:
-            device_name = "unknown GPU"
-        cuda_ver = torch.version.cuda or "unknown"
+        device_str  = f"cuda:{gpu_id}"
+        device_name = torch.cuda.get_device_name(gpu_id) if torch.cuda.is_available() else "?"
+        cuda_ver    = torch.version.cuda or "unknown"
         device_info = f"{device_str}  ({device_name}, CUDA {cuda_ver})"
     else:
         device_info = "cpu  (CUDA not available)"
 
     print("=" * 70)
-    print("  TempDRL — Temporal-Aware DRL for Energy Storage Bidding")
-    print("  Phase 2: SAC Training")
+    print("  TempDRL — ERCOT-Correct Joint-Market Bidding (Fresh Retrain)")
     print("=" * 70)
     print(f"  Device        : {device_info}")
+    print(f"  Markets       : {NUM_MARKETS}  [spot, RegUp, RegDn, RRS, NSRS]")
+    print(f"  State dim     : {STATE_DIM}  (SoC + prices + TTFE + hour_sin_cos)")
+    print(f"  Action dim    : {ACTION_DIM}  (v_dch/v_ch + spot_dch/ch + regup/regdn + rrs + nsrs)")
     print(f"  Episodes      : {num_episodes}")
     print(f"  Eval every    : {eval_every} episodes")
     print(f"  Warmup steps  : {warmup_steps}")
@@ -55,17 +52,15 @@ def _print_banner(
 
 
 if __name__ == "__main__":
-    NUM_EPISODES      = 500                 # TTFE top-up: pair actor with fixed-seed TTFE
+    NUM_EPISODES      = 30_000
     EVAL_EVERY        = 50
-    WARMUP_STEPS      = 0                   # no warmup — actor already trained
+    WARMUP_STEPS      = 2_880    # 10 full episodes of random actions
     GRAD_STEPS_PER_EP = 72
     GPU_ID            = 26
     SAVE_DIR          = "outputs/checkpoints"
-    LOG_DIR           = "outputs/logs"
-    RESUME_CKPT       = "outputs/checkpoints/best_model.pt"  # ep 17100 actor weights
-    START_EPISODE     = 30_001                                # top-up episodes 30001–30500
-
-    from src.config import BATCH_SIZE
+    LOG_DIR_RUN       = "outputs/logs"
+    RESUME_CKPT       = None     # fresh training — no resume
+    START_EPISODE     = 1
 
     _print_banner(
         gpu_id=GPU_ID,
@@ -74,7 +69,7 @@ if __name__ == "__main__":
         warmup_steps=WARMUP_STEPS,
         batch_size=BATCH_SIZE,
         save_dir=SAVE_DIR,
-        log_dir=LOG_DIR,
+        log_dir=LOG_DIR_RUN,
     )
 
     train(
@@ -84,7 +79,7 @@ if __name__ == "__main__":
         grad_steps_per_ep=GRAD_STEPS_PER_EP,
         gpu_id=GPU_ID,
         save_dir=SAVE_DIR,
-        log_dir=LOG_DIR,
+        log_dir=LOG_DIR_RUN,
         resume_ckpt=RESUME_CKPT,
         start_episode=START_EPISODE,
     )
