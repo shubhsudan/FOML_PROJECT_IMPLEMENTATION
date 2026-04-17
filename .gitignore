@@ -1,0 +1,26 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Claude Code internals
+.claude/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+.env
+venv/
+*.ipynb_checkpoints
+
+# Large data files — parquet price data (24 MB, not tracked in git)
+data/processed/
+data/mappings/
+
+# Model checkpoints — large binaries, stored on Narnia
+outputs/checkpoints/
+
+# Keep eval logs and results
+!outputs/logs/

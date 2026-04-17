@@ -1,0 +1,55 @@
+
+=================================================================
+  TempDRL — Stage 1 Revenue Evaluation
+=================================================================
+[Eval] Device: cuda:26
+
+[Data] Eval episodes: 43 days  (12384 timesteps)
+[Model] Checkpoint keys: ['actor_state', 'critic1_state', 'critic2_state', 'critic1_target_state', 'critic2_target_state', 'log_alpha', 'actor_opt_state', 'critic1_opt_state', 'critic2_opt_state', 'alpha_opt_state']
+[Model] Actor loaded from outputs/checkpoints/best_model.pt
+[Model] TTFE initialised with seed=0 (reproducible)
+
+[PIO] Running perfect foresight LP on 43 episodes...
+  ep  10/43  mean so far: $753.03/day
+  ep  20/43  mean so far: $737.89/day
+  ep  30/43  mean so far: $723.29/day
+  ep  40/43  mean so far: $2201.62/day
+  ep  43/43  mean so far: $2080.33/day
+
+[TempDRL Joint] Running 43 greedy episodes...
+  Done. Mean: $1731.40/day  (SoC clips: 112.1/day)
+
+[TempDRL Spot-only] Running 43 greedy episodes...
+  Done. Mean: $776.51/day
+
+[TempDRL FCAS-only] Running 43 greedy episodes...
+  Done. Mean: $962.32/day
+
+========================================================================
+  STAGE 1 RESULTS — Mean Daily Revenue (USD/day)
+  Dataset : ERCOT 2022, Nov–Dec eval set  (43 days)
+  BESS    : 10 MWh / 2 MW, η=0.95, SoC 5–95%
+  Actions : Deterministic tanh(mean) — no sampling noise
+  Revenue : Paper eq. 2+3-4 only — no RL penalties
+========================================================================
+  Policy                       Mean $/day      Std      Min      Max  vs PIO
+------------------------------------------------------------------------
+  PIO (Perfect Foresight)         2080.33  5799.56   416.02 34523.78  100.0%
+  TempDRL Joint                   1731.40  4752.82   208.14 29179.10   83.2% ◀ BEST
+  TempDRL Spot-only                776.51  1761.77   141.12 12083.39   37.3%
+  TempDRL FCAS-only                962.32  4455.07    11.90 28901.00   46.3%
+========================================================================
+
+  TempDRL Joint — mean daily revenue breakdown:
+    Spot market    : $  776.83
+    FCAS markets   : $  955.15
+    Degradation    : $   -0.58  (cost)
+    NET            : $ 1731.40
+    SoC clips/day  :   112.1
+
+  Joint vs Spot-only : +123.0%
+  Joint vs FCAS-only : +79.9%
+  Joint vs PIO       :  83.2% of upper bound
+
+  Results saved to: outputs/logs/stage1_revenue_results.csv
+
