@@ -1,6 +1,11 @@
 """
-config.py — TempDRL hyperparameters, ERCOT 2022 market structure.
+config.py — TempDRL hyperparameters, ERCOT pre-ECRS market structure.
 All market rules sourced from official ERCOT documentation.
+
+Multi-year retrain: 2020-2023 (pre-ECRS months only).
+ECRS went live June 2023 — months with >50% ECRS activity are auto-skipped.
+Energy price: dam_spp (DAM Settlement Point Price) — fully populated all years.
+rt_lmp is null for 2024-2025 in this dataset; dam_spp is consistently available.
 """
 
 import os
@@ -13,14 +18,30 @@ CKPT_DIR   = os.path.join(OUTPUT_DIR, "checkpoints")
 LOG_DIR    = os.path.join(OUTPUT_DIR, "logs")
 PLOT_DIR   = os.path.join(OUTPUT_DIR, "plots")
 
-# ── ERCOT 2022 Market Structure ───────────────────────────────────────────────
+# ── Data Coverage ────────────────────────────────────────────────────────────
+# Parquet engine: fastparquet (pyarrow has format issues with older files)
+PARQUET_ENGINE = "fastparquet"
+
+# Years to include: 2020-2023. Months where ECRS >50% active are auto-skipped.
+# ECRS went live June 2023; 2023-06 is 69% active, 2023-07+ is 100% active.
+# 2024-2025: rt_lmp is null but dam_spp is populated; ECRS active throughout.
+DATA_YEARS = [2020, 2021, 2022, 2023]
+
+# Chronological 70/10/20 train/val/test split across all included days
+TRAIN_FRAC = 0.70
+VAL_FRAC   = 0.10
+TEST_FRAC  = 0.20
+
+# ── ERCOT Pre-ECRS Market Structure ──────────────────────────────────────────
 # 5 markets: 1 energy + 4 AS products
-# ECRS excluded — launched June 2023, all-zero in 2022 data (verified)
+# ECRS excluded — not active pre-June 2023; auto-filtered by data_loader
 NUM_MARKETS  = 5
 MARKET_NAMES = ["spot", "RegUp", "RegDn", "RRS", "NSRS"]
 
 # Data column mapping (verified against actual parquet files)
-ENERGY_COL = "rt_lmp"           # Real-time LMP $/MWh — energy_prices table
+# dam_spp = DAM Settlement Point Price — fully populated 2020-2025
+# rt_lmp  = Real-time LMP — null for 2024-2025 in this dataset
+ENERGY_COL = "dam_spp"          # DAM Settlement Point Price $/MWh
 AS_COLS = {
     "RegUp": "dam_as_regup",    # Regulation Up   — discharge direction, 1-hr
     "RegDn": "dam_as_regdn",    # Regulation Down — charge direction,    1-hr
@@ -43,9 +64,9 @@ AS_DURATION_H = {
 }
 
 # ── Data Split ────────────────────────────────────────────────────────────────
-TRAIN_YEAR        = 2022
-TRAIN_MONTHS      = list(range(1, 11))   # Jan–Oct (10 months)
-EVAL_MONTHS       = [11, 12]             # Nov–Dec (2 months)
+TRAIN_YEAR        = 2022                 # kept for backward compat only
+TRAIN_MONTHS      = list(range(1, 11))   # kept for backward compat only
+EVAL_MONTHS       = [11, 12]             # kept for backward compat only
 TIMESTEPS_PER_DAY = 288                  # 5-min intervals per day
 TIMESTEPS_PER_HOUR = 12                  # 5-min intervals per hour
 
@@ -95,7 +116,7 @@ GAMMA               = 0.99
 TAU_TARGET          = 0.005
 ALPHA_ENTROPY       = 0.05                        # initial entropy temperature
 TARGET_ENTROPY      = -float(ACTION_DIM) * 0.5   # = -4.0
-REPLAY_BUFFER_SIZE  = 100_000
+REPLAY_BUFFER_SIZE  = 300_000
 BATCH_SIZE          = 1024
 GRAD_STEPS_PER_EP   = 72
 MAX_GRAD_NORM       = 1.0

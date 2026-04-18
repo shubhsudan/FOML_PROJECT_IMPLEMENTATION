@@ -1,10 +1,12 @@
 """
-main_phase2.py — Entry point for TempDRL SAC training (ERCOT-correct).
+main_phase2.py — Entry point for TempDRL SAC training (multi-year ERCOT).
 
-ERCOT 2022 implementation:
+Multi-year retrain: 2020-2023 pre-ECRS (1,243 complete days, ~4.5x more than 2022-only).
   - 5 markets: spot + RegUp + RegDn + RRS + NSRS
+  - Energy price: dam_spp (DAM Settlement Point Price — fully populated all years)
   - 8-dim action space
   - 72-dim state space (SoC + prices + TTFE + hour_sin_cos)
+  - Chronological 70/10/20 train/val/test split
   - TTFE saved in every checkpoint
 
 Hardware target:
@@ -52,9 +54,9 @@ def _print_banner(gpu_id, num_episodes, eval_every, warmup_steps,
 
 
 if __name__ == "__main__":
-    NUM_EPISODES      = 30_000
-    EVAL_EVERY        = 50
-    WARMUP_STEPS      = 2_880    # 10 full episodes of random actions
+    NUM_EPISODES      = 60_000
+    EVAL_EVERY        = 100      # less frequent: val set is 3x larger than 2022-only
+    WARMUP_STEPS      = 10_000   # ~35 episodes of random actions to seed 300k buffer
     GRAD_STEPS_PER_EP = 72
     GPU_ID            = 26
     SAVE_DIR          = "outputs/checkpoints"
