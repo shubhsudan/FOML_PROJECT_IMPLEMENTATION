@@ -1,0 +1,71 @@
+
+======================================================================
+  TempDRL Phase 2 — Multi-Year ERCOT Stage 1 Revenue Evaluation
+  Checkpoint : best_model.pt  (ep 33,500,  val=$2,233/day)
+  Test set   : 249 days, 2022-09-24 → 2023-05-31
+  PIO workers: 32 parallel
+======================================================================
+[Eval] Device: cuda:26
+
+[DataLoader] Loading years [2020, 2021, 2022, 2023] ...
+[DataLoader] Skipped 7 ECRS-active months: 2023-06 … 2023-12
+[DataLoader] Total rows after join+clean: 358,854
+[DataLoader] Split: train=870 days (70%)  val=124 days (10%)  test=249 days (20%)
+[DataLoader] Date ranges:
+  Train: 2020-01-02 → 2022-05-22
+  Val:   2022-05-23 → 2022-09-23
+  Test:  2022-09-24 → 2023-05-31
+[DataLoader] 249 complete daily episodes (288 steps each)
+[DataLoader] 249 complete daily episodes (288 steps each)
+[Data] Test episodes: 249 days
+
+[Data] Price ranges for test set:
+  spot    : min=   -0.07  mean=   35.50  max= 2539.16 $/MW
+  RegUp   : min=    0.01  mean=   11.10  max= 2977.77 $/MW
+  RegDn   : min=    0.01  mean=    5.61  max= 1000.00 $/MW
+  RRS     : min=    1.00  mean=    9.31  max= 2976.97 $/MW
+  NSRS    : min=    0.09  mean=   12.29  max= 2976.77 $/MW
+[Model] Keys: ['actor_state', 'critic1_state', 'critic2_state', 'critic1_target_state', 'critic2_target_state', 'log_alpha', 'actor_opt_state', 'critic1_opt_state', 'critic2_opt_state', 'alpha_opt_state', 'ttfe_state']
+[Model] TTFE paired weights loaded
+[Model] Loaded from outputs/checkpoints/best_model.pt  (ep 33,500 best)
+[PIO] Solving 249 MILPs across 32 workers...
+[PIO] Done in 57.1s. Mean: $806.22/day
+
+[TempDRL Joint] Running 249 greedy episodes...
+  Done. Mean: $519.18/day  (SoC clips: 25.6/day)
+
+[TempDRL Spot-only] Running 249 greedy episodes...
+  Done. Mean: $250.82/day
+
+[TempDRL AS-only] Running 249 greedy episodes...
+  Done. Mean: $267.97/day
+
+==========================================================================
+  PHASE 2 RESULTS — Multi-Year ERCOT Mean Daily Revenue (USD/day)
+  Dataset : ERCOT multi-year test set  (249 days, Sep 2022 – May 2023)
+  Markets : spot + RegUp + RegDn + RRS + NSRS  (5 total, ECRS excluded)
+  BESS    : 10 MWh / 2 MW, η=0.95, SoC 5–95%
+  Actions : Deterministic tanh(mean), no sampling noise
+==========================================================================
+  Policy                       Mean $/day      Std      Min      Max  vs PIO
+--------------------------------------------------------------------------
+  PIO (Perfect Foresight)          806.22  2415.30   223.45 36834.84  100.0%
+  TempDRL Joint                    519.18  2132.64  -177.98 31968.95   64.4% ◀ BEST
+  TempDRL Spot-only                250.82   946.36  -247.71 13712.79   31.1%
+  TempDRL AS-only                  267.97  1204.27     4.47 18256.07   33.2%
+==========================================================================
+
+  TempDRL Joint — mean daily revenue breakdown:
+    Spot market    : $  250.92
+    AS markets     : $  268.56
+    Degradation    : $   -0.29  (cost)
+    NET            : $  519.18
+    SoC clips/day  :    25.6
+
+  Joint vs Spot-only : +107.0%
+  Joint vs AS-only   : +93.7%
+  Joint vs PIO       :  64.4% of upper bound
+
+  Total wall time    :  96.1s
+  Results saved to: outputs/logs/phase2_revenue_results.csv
+
