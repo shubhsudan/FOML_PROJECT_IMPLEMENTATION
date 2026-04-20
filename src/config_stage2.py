@@ -90,7 +90,7 @@ UNFREEZE_TOP_AT_EP  = 500    # Phase B: unfreeze top MHA layer  (lr=1e-5)
 UNFREEZE_FULL_AT_EP = 1500   # Phase C: unfreeze all TTFE params (lr=1e-5)
 
 # ── Stage 2 Training Hyperparameters ──────────────────────────────────────────
-STAGE2_EPISODES    = 3000
+STAGE2_EPISODES    = 5000
 STAGE2_BATCH_SIZE  = 128
 STAGE2_BUFFER_SIZE = 30_000
 GRAD_STEPS_PER_EP_S2 = 32    # fewer steps per ep (small dataset)
@@ -115,7 +115,7 @@ AS_DURATION_H_S2 = {
 }
 
 # ── Divergence Guard ──────────────────────────────────────────────────────────
-MAX_VIOLATIONS_PER_EP = 20    # reload best ckpt + halve LR if exceeded
+MAX_VIOLATIONS_PER_EP = 30    # Phase A threshold; Phase B/C uses 50
 
 # ── Train/Val/Test Split ──────────────────────────────────────────────────────
 STAGE2_TRAIN_FRAC = 0.70

@@ -477,10 +477,11 @@ def run_stage2(
     ttfe_opt    = None
 
     # ── Replay buffer ─────────────────────────────────────────────────────────
-    buffer      = ReplayBufferS2(capacity=STAGE2_BUFFER_SIZE, device=device)
-    best_val    = -float("inf")
-    best_path   = os.path.join(save_dir, "best_model_s2.pt")
+    buffer        = ReplayBufferS2(capacity=STAGE2_BUFFER_SIZE, device=device)
+    best_val      = -float("inf")
+    best_path     = os.path.join(save_dir, "best_model_s2.pt")
     current_phase = "A"
+    _guard_cooldown = 0    # episodes since last divergence guard fired
 
     # ── Logging ───────────────────────────────────────────────────────────────
     os.makedirs(save_dir, exist_ok=True)
@@ -602,14 +603,21 @@ def run_stage2(
             ema_spot = 0.99 * ema_spot + 0.01 * float(prices_raw[t, 0])
 
         # ── Divergence guard ─────────────────────────────────────────────────
-        if n_vio > MAX_VIOLATIONS_PER_EP and os.path.exists(best_path):
-            _log(f"[Stage2] ep {ep}: violations={n_vio} > {MAX_VIOLATIONS_PER_EP} — "
-                 f"reloading best checkpoint + halving LRs")
+        # Threshold: 50 in Phase B/C (transient violations expected), 20 in Phase A.
+        # Cooldown: at most once per 50 episodes to prevent LR collapse.
+        _guard_cooldown = max(0, _guard_cooldown - 1)
+        vio_thresh = 50 if current_phase in ("B", "C") else MAX_VIOLATIONS_PER_EP
+        if (n_vio > vio_thresh and _guard_cooldown == 0
+                and os.path.exists(best_path)):
+            _log(f"[Stage2] ep {ep}: violations={n_vio} > {vio_thresh} (phase={current_phase})"
+                 f" — reloading best ckpt + halving actor/critic LRs")
             load_checkpoint_s2(best_path, ttfe, actor, critic1, critic2,
                                critic1_tgt, critic2_tgt, log_alpha, device)
-            for g in actor_opt.param_groups:   g["lr"] /= 2.0
-            for g in critic1_opt.param_groups: g["lr"] /= 2.0
-            for g in critic2_opt.param_groups: g["lr"] /= 2.0
+            # Only halve actor/critic LRs; keep TTFE LR stable for fine-tuning
+            for g in actor_opt.param_groups:   g["lr"] = max(g["lr"] / 2.0, 1e-6)
+            for g in critic1_opt.param_groups: g["lr"] = max(g["lr"] / 2.0, 1e-6)
+            for g in critic2_opt.param_groups: g["lr"] = max(g["lr"] / 2.0, 1e-6)
+            _guard_cooldown = 50   # don't fire again for 50 episodes
 
         # ── Gradient updates ──────────────────────────────────────────────────
         if len(buffer) >= batch_size:
