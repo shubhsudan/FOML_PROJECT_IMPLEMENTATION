@@ -64,7 +64,7 @@ def main():
 
     # Load Stage 2 weights
     if os.path.exists(STAGE2_CKPT):
-        ckpt = torch.load(STAGE2_CKPT, map_location=device)
+        ckpt = torch.load(STAGE2_CKPT, map_location=device, weights_only=False)
         # Stage 2 checkpoint uses 'ttfe_s2_state', 'actor_state', 'critic1_state', ...
         ttfe_key   = "ttfe_s2_state" if "ttfe_s2_state" in ckpt else "ttfe_state"
         actor_key  = "actor_state"   if "actor_state"   in ckpt else "actor"
@@ -253,11 +253,11 @@ def main():
             # Divergence guard
             if divergence_cooldown > 0:
                 divergence_cooldown -= 1
-            if mean_rl < 0 and divergence_cooldown == 0:
+            if mean_rl < -50 and divergence_cooldown == 0:
                 best_path = os.path.join(STAGE3_DIR, "best_model_s3.pt")
                 if os.path.exists(best_path):
                     print("  !! Divergence guard: reloading best checkpoint")
-                    ckpt = torch.load(best_path, map_location=device)
+                    ckpt = torch.load(best_path, map_location=device, weights_only=False)
                     ttfe.load_state_dict(ckpt["ttfe_state"])
                     agent.actor.load_state_dict(ckpt["actor"])
                     agent.critic1.load_state_dict(ckpt["critic1"])

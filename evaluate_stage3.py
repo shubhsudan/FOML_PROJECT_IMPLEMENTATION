@@ -45,7 +45,7 @@ def run_evaluation():
     # Load TempDRL model
     ttfe  = TTFE_S2().to(device)
     agent = SACAgent(obs_dim=STATE_DIM, act_dim=ACTION_DIM, device=device)
-    ckpt  = torch.load(CHECKPOINT, map_location=device)
+    ckpt  = torch.load(CHECKPOINT, map_location=device, weights_only=False)
     ttfe.load_state_dict(ckpt["ttfe_state"])
     agent.actor.load_state_dict(ckpt["actor"])
     agent.critic1.load_state_dict(ckpt["critic1"])
