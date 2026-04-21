@@ -105,6 +105,19 @@ def main():
 
     for ep in range(1, N_EPISODES + 1):
 
+        # LR decay + entropy reduction at ep 1500 to break plateau
+        if ep == 1500:
+            print("Ep 1500: halving LR and reducing entropy for exploitation phase")
+            for pg in agent.actor_optimizer.param_groups:
+                pg["lr"] *= 0.5
+            for pg in agent.critic1_optimizer.param_groups:
+                pg["lr"] *= 0.5
+            for pg in agent.critic2_optimizer.param_groups:
+                pg["lr"] *= 0.5
+            # Reduce entropy temperature: clamp log_alpha downward
+            with torch.no_grad():
+                agent.log_alpha.clamp_(max=math.log(0.02))
+
         # TTFE stays frozen for all 5000 eps in Stage 3.
         # Stage 2 already converged TTFE; fine-tuning it here caused
         # severe oscillations because the separate TTFE actor-loss pass
