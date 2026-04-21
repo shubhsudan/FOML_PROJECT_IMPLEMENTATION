@@ -201,6 +201,16 @@ class BESSEnvStage3:
 
         # --- 7. Reward shaping ---
         reward = total_rev
+
+        # AS utilisation bonus: nudge agent toward max-bidding all products.
+        # Scaled to ~$0.01/step at full bid = $2.88/day — small enough not to
+        # dominate revenue signal, big enough to break the NSRS under-bidding.
+        # Uses DAM MCPC weights so NSRS (highest spread) gets strongest signal.
+        as_util_bonus = 0.0
+        for i, prod in enumerate(self.PRODUCTS):
+            as_util_bonus += (as_bids[i] / FCAS_MAX) * DAM_MCPC_PRIOR[prod] * dt * 0.1
+        reward += as_util_bonus
+
         if soc_violation:
             reward -= SOC_VIOLATION_PENALTY
 
