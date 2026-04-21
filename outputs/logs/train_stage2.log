@@ -1,0 +1,647 @@
+====================================================================
+  TempDRL Stage 2 — RTC+B Regime Shift Adaptation
+====================================================================
+
+====================================================================
+  TempDRL Stage 2 — RTC+B Regime Shift Adaptation
+  Phase A: TTFE frozen   (ep 1–499)
+  Phase B: top MHA lr=1e-05 (ep 500–1499)
+  Phase C: full unfreeze (ep 1500–5000)
+  Device: cuda:26
+====================================================================
+
+[Stage2] Loading post-RTC+B data...
+[DataLoaderS2] Total rows loaded: 127,825  (post-RTC+B: 30,481)
+[DataLoaderS2] Post-RTC+B complete days: 100  (train=70, val=15, test=15)
+[DataLoaderS2] Date range: 2025-12-06 → 2026-03-21
+[DataLoaderS2] 70 complete daily episodes (288 steps each)
+[DataLoaderS2] 15 complete daily episodes (288 steps each)
+[Stage2] Train: 70 days | Val: 15 days
+[TTFE_S2] Stage 1 checkpoint keys: ['actor_state', 'critic1_state', 'critic2_state', 'critic1_target_state', 'critic2_target_state', 'log_alpha', 'actor_opt_state', 'critic1_opt_state', 'critic2_opt_state', 'alpha_opt_state', 'ttfe_state']
+[TTFE_S2] MHA layer 0 weights transferred from Stage 1
+[TTFE_S2] MHA layer 1 weights transferred from Stage 1
+[TTFE_S2] feature_embedding re-initialized (5→12 input dim, shape incompatible with Stage 1)
+[TTFE_S2] Transferred 2/2 MHA layers. Stage 2 TTFE ready.
+[TTFE_S2] Initialized in Phase A (fully frozen)
+[Stage2] Actor ECRS output dim (idx 7) initialized near-zero
+[Stage2] ep 5: violations=47 > 30 (phase=A) — reloading best ckpt + halving actor/critic LRs
+ep    10 | phase=A | rev=$851.27 | vio= 22 | buf=2880 | alpha=0.0591 | t=15s
+ep    20 | phase=A | rev=$206.32 | vio=  5 | buf=5760 | alpha=0.0611 | t=27s
+ep    30 | phase=A | rev=$207.20 | vio=  5 | buf=8640 | alpha=0.0631 | t=39s
+ep    40 | phase=A | rev=$15522.37 | vio= 22 | buf=11520 | alpha=0.0651 | t=51s
+ep    50 | phase=A | rev=$247.37 | vio=  6 | buf=14400 | alpha=0.0672 | t=63s
+  [EVAL] ep    50 | val=$107.74/day | phase=A | best=$-inf | t=64s
+  [BEST] Saved new best: $107.74/day → /home/stu9/s7/ss2401/tempdrl/outputs/checkpoints/stage2/best_model_s2.pt
+ep    60 | phase=A | rev=$125.24 | vio=  5 | buf=17280 | alpha=0.0694 | t=77s
+ep    70 | phase=A | rev=$1050.53 | vio= 18 | buf=20160 | alpha=0.0717 | t=88s
+ep    80 | phase=A | rev=$144.88 | vio=  1 | buf=23040 | alpha=0.0740 | t=100s
+ep    90 | phase=A | rev=$305.85 | vio= 11 | buf=25920 | alpha=0.0764 | t=112s
+ep   100 | phase=A | rev=$306.50 | vio= 10 | buf=28800 | alpha=0.0789 | t=124s
+  [EVAL] ep   100 | val=$69.48/day | phase=A | best=$107.74 | t=125s
+ep   110 | phase=A | rev=$797.65 | vio= 16 | buf=30000 | alpha=0.0815 | t=137s
+ep   120 | phase=A | rev=$153.14 | vio=  2 | buf=30000 | alpha=0.0841 | t=148s
+ep   130 | phase=A | rev=$448.42 | vio=  6 | buf=30000 | alpha=0.0868 | t=160s
+ep   140 | phase=A | rev=$79.78 | vio=  0 | buf=30000 | alpha=0.0897 | t=173s
+ep   150 | phase=A | rev=$299.42 | vio=  5 | buf=30000 | alpha=0.0926 | t=185s
+  [EVAL] ep   150 | val=$67.10/day | phase=A | best=$107.74 | t=186s
+ep   160 | phase=A | rev=$159.90 | vio=  2 | buf=30000 | alpha=0.0956 | t=198s
+ep   170 | phase=A | rev=$79.84 | vio=  0 | buf=30000 | alpha=0.0987 | t=209s
+ep   180 | phase=A | rev=$89.61 | vio=  0 | buf=30000 | alpha=0.1019 | t=221s
+ep   190 | phase=A | rev=$110.95 | vio=  1 | buf=30000 | alpha=0.1052 | t=233s
+ep   200 | phase=A | rev=$52.21 | vio=  0 | buf=30000 | alpha=0.1086 | t=244s
+  [EVAL] ep   200 | val=$54.15/day | phase=A | best=$107.74 | t=246s
+ep   210 | phase=A | rev=$154.77 | vio=  0 | buf=30000 | alpha=0.1121 | t=257s
+ep   220 | phase=A | rev=$154.82 | vio=  0 | buf=30000 | alpha=0.1158 | t=268s
+ep   230 | phase=A | rev=$102.36 | vio=  0 | buf=30000 | alpha=0.1195 | t=278s
+ep   240 | phase=A | rev=$95.03 | vio=  1 | buf=30000 | alpha=0.1234 | t=289s
+ep   250 | phase=A | rev=$301.51 | vio=  6 | buf=30000 | alpha=0.1274 | t=300s
+  [EVAL] ep   250 | val=$43.70/day | phase=A | best=$107.74 | t=302s
+ep   260 | phase=A | rev=$253.88 | vio=  6 | buf=30000 | alpha=0.1316 | t=313s
+[Stage2] ep 268: violations=39 > 30 (phase=A) — reloading best ckpt + halving actor/critic LRs
+ep   270 | phase=A | rev=$238.41 | vio=  6 | buf=30000 | alpha=0.0679 | t=324s
+ep   280 | phase=A | rev=$192.53 | vio=  4 | buf=30000 | alpha=0.0701 | t=334s
+ep   290 | phase=A | rev=$371.35 | vio= 10 | buf=30000 | alpha=0.0724 | t=345s
+ep   300 | phase=A | rev=$51.85 | vio=  0 | buf=30000 | alpha=0.0747 | t=356s
+  [EVAL] ep   300 | val=$63.04/day | phase=A | best=$107.74 | t=358s
+ep   310 | phase=A | rev=$58.46 | vio=  0 | buf=30000 | alpha=0.0771 | t=369s
+ep   320 | phase=A | rev=$72.34 | vio=  0 | buf=30000 | alpha=0.0797 | t=379s
+ep   330 | phase=A | rev=$24.56 | vio=  0 | buf=30000 | alpha=0.0822 | t=389s
+ep   340 | phase=A | rev=$27.69 | vio= 10 | buf=30000 | alpha=0.0849 | t=401s
+ep   350 | phase=A | rev=$299.82 | vio=  1 | buf=30000 | alpha=0.0877 | t=411s
+  [EVAL] ep   350 | val=$52.60/day | phase=A | best=$107.74 | t=412s
+ep   360 | phase=A | rev=$119.61 | vio=  0 | buf=30000 | alpha=0.0905 | t=423s
+ep   370 | phase=A | rev=$466.15 | vio= 18 | buf=30000 | alpha=0.0935 | t=433s
+ep   380 | phase=A | rev=$95.47 | vio=  0 | buf=30000 | alpha=0.0965 | t=444s
+ep   390 | phase=A | rev=$759.69 | vio= 17 | buf=30000 | alpha=0.0996 | t=456s
+ep   400 | phase=A | rev=$75.79 | vio=  0 | buf=30000 | alpha=0.1029 | t=467s
+  [EVAL] ep   400 | val=$29.33/day | phase=A | best=$107.74 | t=468s
+ep   410 | phase=A | rev=$171.62 | vio=  1 | buf=30000 | alpha=0.1062 | t=479s
+[Stage2] ep 419: violations=69 > 30 (phase=A) — reloading best ckpt + halving actor/critic LRs
+ep   420 | phase=A | rev=$502.30 | vio= 18 | buf=30000 | alpha=0.0677 | t=489s
+ep   430 | phase=A | rev=$72.75 | vio=  0 | buf=30000 | alpha=0.0699 | t=500s
+ep   440 | phase=A | rev=$-8.55 | vio=  9 | buf=30000 | alpha=0.0721 | t=509s
+ep   450 | phase=A | rev=$129.44 | vio=  0 | buf=30000 | alpha=0.0745 | t=518s
+  [EVAL] ep   450 | val=$27.47/day | phase=A | best=$107.74 | t=520s
+ep   460 | phase=A | rev=$421.74 | vio=  7 | buf=30000 | alpha=0.0769 | t=529s
+ep   470 | phase=A | rev=$131.64 | vio=  0 | buf=30000 | alpha=0.0794 | t=539s
+ep   480 | phase=A | rev=$45.96 | vio=  0 | buf=30000 | alpha=0.0820 | t=551s
+ep   490 | phase=A | rev=$521.65 | vio=  9 | buf=30000 | alpha=0.0846 | t=563s
+[Stage2] ep 494: violations=31 > 30 (phase=A) — reloading best ckpt + halving actor/critic LRs
+[Phase B] ep 500: top MHA layer unfrozen (lr=1e-05)
+ep   500 | phase=B | rev=$310.99 | vio=  9 | buf=30000 | alpha=0.0688 | t=575s
+  [EVAL] ep   500 | val=$152.79/day | phase=B | best=$107.74 | t=575s
+  [BEST] Saved new best: $152.79/day → /home/stu9/s7/ss2401/tempdrl/outputs/checkpoints/stage2/best_model_s2.pt
+ep   510 | phase=B | rev=$300.82 | vio= 21 | buf=30000 | alpha=0.0710 | t=591s
+ep   520 | phase=B | rev=$338.51 | vio= 21 | buf=30000 | alpha=0.0718 | t=606s
+ep   530 | phase=B | rev=$50.42 | vio=  1 | buf=30000 | alpha=0.0698 | t=621s
+ep   540 | phase=B | rev=$116.90 | vio=  0 | buf=30000 | alpha=0.0677 | t=636s
+ep   550 | phase=B | rev=$171.83 | vio=  3 | buf=30000 | alpha=0.0654 | t=651s
+  [EVAL] ep   550 | val=$65.63/day | phase=B | best=$152.79 | t=652s
+ep   560 | phase=B | rev=$409.76 | vio= 10 | buf=30000 | alpha=0.0633 | t=667s
+ep   570 | phase=B | rev=$31.37 | vio=  0 | buf=30000 | alpha=0.0613 | t=682s
+ep   580 | phase=B | rev=$118.98 | vio=  2 | buf=30000 | alpha=0.0604 | t=697s
+ep   590 | phase=B | rev=$3051.79 | vio= 22 | buf=30000 | alpha=0.0615 | t=712s
+ep   600 | phase=B | rev=$48.22 | vio=  0 | buf=30000 | alpha=0.0638 | t=728s
+  [EVAL] ep   600 | val=$94.62/day | phase=B | best=$152.79 | t=729s
+ep   610 | phase=B | rev=$98.66 | vio=  1 | buf=30000 | alpha=0.0661 | t=744s
+ep   620 | phase=B | rev=$473.37 | vio=  8 | buf=30000 | alpha=0.0684 | t=759s
+ep   630 | phase=B | rev=$296.80 | vio=  7 | buf=30000 | alpha=0.0708 | t=774s
+ep   640 | phase=B | rev=$97.91 | vio=  1 | buf=30000 | alpha=0.0732 | t=788s
+ep   650 | phase=B | rev=$41.70 | vio=  0 | buf=30000 | alpha=0.0757 | t=804s
+  [EVAL] ep   650 | val=$82.79/day | phase=B | best=$152.79 | t=805s
+ep   660 | phase=B | rev=$221.08 | vio=  6 | buf=30000 | alpha=0.0782 | t=820s
+ep   670 | phase=B | rev=$24.64 | vio=  0 | buf=30000 | alpha=0.0808 | t=835s
+ep   680 | phase=B | rev=$511.34 | vio=  7 | buf=30000 | alpha=0.0834 | t=850s
+ep   690 | phase=B | rev=$243.43 | vio=  4 | buf=30000 | alpha=0.0861 | t=866s
+ep   700 | phase=B | rev=$504.75 | vio=  6 | buf=30000 | alpha=0.0890 | t=879s
+  [EVAL] ep   700 | val=$93.00/day | phase=B | best=$152.79 | t=880s
+ep   710 | phase=B | rev=$178.93 | vio=  1 | buf=30000 | alpha=0.0919 | t=895s
+ep   720 | phase=B | rev=$53.48 | vio=  0 | buf=30000 | alpha=0.0949 | t=910s
+ep   730 | phase=B | rev=$393.19 | vio=  3 | buf=30000 | alpha=0.0980 | t=925s
+ep   740 | phase=B | rev=$3684.42 | vio= 22 | buf=30000 | alpha=0.1011 | t=942s
+ep   750 | phase=B | rev=$143.47 | vio=  1 | buf=30000 | alpha=0.1044 | t=957s
+  [EVAL] ep   750 | val=$99.79/day | phase=B | best=$152.79 | t=958s
+ep   760 | phase=B | rev=$0.00 | vio=  0 | buf=30000 | alpha=0.1078 | t=973s
+ep   770 | phase=B | rev=$61.45 | vio=  0 | buf=30000 | alpha=0.1113 | t=985s
+ep   780 | phase=B | rev=$174.25 | vio=  4 | buf=30000 | alpha=0.1150 | t=998s
+ep   790 | phase=B | rev=$318.27 | vio=  5 | buf=30000 | alpha=0.1187 | t=1011s
+ep   800 | phase=B | rev=$285.37 | vio=  6 | buf=30000 | alpha=0.1226 | t=1023s
+  [EVAL] ep   800 | val=$44.37/day | phase=B | best=$152.79 | t=1025s
+ep   810 | phase=B | rev=$23.26 | vio=  0 | buf=30000 | alpha=0.1266 | t=1037s
+ep   820 | phase=B | rev=$686.07 | vio= 11 | buf=30000 | alpha=0.1307 | t=1050s
+ep   830 | phase=B | rev=$178.96 | vio=  1 | buf=30000 | alpha=0.1349 | t=1063s
+ep   840 | phase=B | rev=$0.00 | vio=  0 | buf=30000 | alpha=0.1393 | t=1075s
+ep   850 | phase=B | rev=$15.60 | vio=  0 | buf=30000 | alpha=0.1438 | t=1088s
+  [EVAL] ep   850 | val=$47.30/day | phase=B | best=$152.79 | t=1089s
+ep   860 | phase=B | rev=$24.94 | vio=  0 | buf=30000 | alpha=0.1485 | t=1102s
+ep   870 | phase=B | rev=$-7.00 | vio=  0 | buf=30000 | alpha=0.1534 | t=1115s
+ep   880 | phase=B | rev=$19.38 | vio=  0 | buf=30000 | alpha=0.1583 | t=1127s
+ep   890 | phase=B | rev=$-9.90 | vio=  0 | buf=30000 | alpha=0.1635 | t=1140s
+ep   900 | phase=B | rev=$121.08 | vio=  3 | buf=30000 | alpha=0.1688 | t=1153s
+  [EVAL] ep   900 | val=$59.24/day | phase=B | best=$152.79 | t=1154s
+ep   910 | phase=B | rev=$90.95 | vio=  1 | buf=30000 | alpha=0.1743 | t=1167s
+ep   920 | phase=B | rev=$30.21 | vio=  0 | buf=30000 | alpha=0.1800 | t=1179s
+ep   930 | phase=B | rev=$198.84 | vio=  5 | buf=30000 | alpha=0.1858 | t=1192s
+ep   940 | phase=B | rev=$37.76 | vio=  0 | buf=30000 | alpha=0.1919 | t=1205s
+ep   950 | phase=B | rev=$-16.99 | vio=  0 | buf=30000 | alpha=0.1981 | t=1217s
+  [EVAL] ep   950 | val=$45.38/day | phase=B | best=$152.79 | t=1219s
+ep   960 | phase=B | rev=$4.32 | vio=  0 | buf=30000 | alpha=0.2045 | t=1231s
+ep   970 | phase=B | rev=$3108.92 | vio= 12 | buf=30000 | alpha=0.2112 | t=1244s
+ep   980 | phase=B | rev=$2722.71 | vio= 21 | buf=30000 | alpha=0.2181 | t=1257s
+ep   990 | phase=B | rev=$119.82 | vio=  3 | buf=30000 | alpha=0.2251 | t=1270s
+ep  1000 | phase=B | rev=$5.53 | vio=  0 | buf=30000 | alpha=0.2324 | t=1282s
+  [EVAL] ep  1000 | val=$10.55/day | phase=B | best=$152.79 | t=1283s
+ep  1010 | phase=B | rev=$29.39 | vio=  0 | buf=30000 | alpha=0.2400 | t=1296s
+ep  1020 | phase=B | rev=$1842.27 | vio= 12 | buf=30000 | alpha=0.2478 | t=1309s
+[Stage2] ep 1024: violations=60 > 50 (phase=B) — reloading best ckpt + halving actor/critic LRs
+ep  1030 | phase=B | rev=$373.24 | vio= 22 | buf=30000 | alpha=0.0703 | t=1322s
+ep  1040 | phase=B | rev=$351.96 | vio= 21 | buf=30000 | alpha=0.0726 | t=1335s
+ep  1050 | phase=B | rev=$433.50 | vio= 20 | buf=30000 | alpha=0.0750 | t=1347s
+  [EVAL] ep  1050 | val=$370.71/day | phase=B | best=$152.79 | t=1349s
+  [BEST] Saved new best: $370.71/day → /home/stu9/s7/ss2401/tempdrl/outputs/checkpoints/stage2/best_model_s2.pt
+ep  1060 | phase=B | rev=$2212.97 | vio= 21 | buf=30000 | alpha=0.0774 | t=1362s
+ep  1070 | phase=B | rev=$242.89 | vio= 17 | buf=30000 | alpha=0.0798 | t=1374s
+ep  1080 | phase=B | rev=$237.33 | vio= 13 | buf=30000 | alpha=0.0780 | t=1387s
+ep  1090 | phase=B | rev=$192.22 | vio=  8 | buf=30000 | alpha=0.0755 | t=1400s
+ep  1100 | phase=B | rev=$114.94 | vio=  3 | buf=30000 | alpha=0.0730 | t=1413s
+  [EVAL] ep  1100 | val=$97.99/day | phase=B | best=$370.71 | t=1414s
+ep  1110 | phase=B | rev=$230.52 | vio=  3 | buf=30000 | alpha=0.0707 | t=1426s
+ep  1120 | phase=B | rev=$631.81 | vio= 12 | buf=30000 | alpha=0.0686 | t=1439s
+ep  1130 | phase=B | rev=$1982.21 | vio= 13 | buf=30000 | alpha=0.0667 | t=1452s
+ep  1140 | phase=B | rev=$3989.11 | vio= 20 | buf=30000 | alpha=0.0649 | t=1465s
+ep  1150 | phase=B | rev=$3968.70 | vio= 20 | buf=30000 | alpha=0.0641 | t=1477s
+  [EVAL] ep  1150 | val=$136.35/day | phase=B | best=$370.71 | t=1479s
+ep  1160 | phase=B | rev=$153.37 | vio=  2 | buf=30000 | alpha=0.0650 | t=1491s
+ep  1170 | phase=B | rev=$1093.61 | vio= 15 | buf=30000 | alpha=0.0669 | t=1504s
+ep  1180 | phase=B | rev=$-13.06 | vio=  0 | buf=30000 | alpha=0.0695 | t=1517s
+ep  1190 | phase=B | rev=$79.12 | vio=  2 | buf=30000 | alpha=0.0722 | t=1529s
+ep  1200 | phase=B | rev=$37.00 | vio=  0 | buf=30000 | alpha=0.0748 | t=1542s
+  [EVAL] ep  1200 | val=$39.23/day | phase=B | best=$370.71 | t=1543s
+ep  1210 | phase=B | rev=$60.14 | vio=  0 | buf=30000 | alpha=0.0775 | t=1556s
+ep  1220 | phase=B | rev=$116.17 | vio=  2 | buf=30000 | alpha=0.0801 | t=1569s
+ep  1230 | phase=B | rev=$195.49 | vio=  4 | buf=30000 | alpha=0.0829 | t=1581s
+ep  1240 | phase=B | rev=$182.21 | vio=  4 | buf=30000 | alpha=0.0856 | t=1594s
+ep  1250 | phase=B | rev=$70.47 | vio=  0 | buf=30000 | alpha=0.0885 | t=1607s
+  [EVAL] ep  1250 | val=$89.23/day | phase=B | best=$370.71 | t=1608s
+ep  1260 | phase=B | rev=$165.16 | vio=  2 | buf=30000 | alpha=0.0914 | t=1621s
+ep  1270 | phase=B | rev=$56.49 | vio=  1 | buf=30000 | alpha=0.0944 | t=1633s
+ep  1280 | phase=B | rev=$1892.82 | vio= 13 | buf=30000 | alpha=0.0975 | t=1646s
+ep  1290 | phase=B | rev=$1865.32 | vio= 13 | buf=30000 | alpha=0.1007 | t=1659s
+ep  1300 | phase=B | rev=$342.43 | vio=  7 | buf=30000 | alpha=0.1040 | t=1671s
+  [EVAL] ep  1300 | val=$63.94/day | phase=B | best=$370.71 | t=1672s
+ep  1310 | phase=B | rev=$91.62 | vio=  0 | buf=30000 | alpha=0.1074 | t=1685s
+ep  1320 | phase=B | rev=$58.23 | vio=  0 | buf=30000 | alpha=0.1109 | t=1698s
+ep  1330 | phase=B | rev=$91.00 | vio=  1 | buf=30000 | alpha=0.1145 | t=1710s
+ep  1340 | phase=B | rev=$52.88 | vio=  0 | buf=30000 | alpha=0.1182 | t=1723s
+ep  1350 | phase=B | rev=$1.65 | vio=  0 | buf=30000 | alpha=0.1221 | t=1736s
+  [EVAL] ep  1350 | val=$80.64/day | phase=B | best=$370.71 | t=1737s
+ep  1360 | phase=B | rev=$15.41 | vio=  0 | buf=30000 | alpha=0.1260 | t=1750s
+ep  1370 | phase=B | rev=$121.70 | vio=  1 | buf=30000 | alpha=0.1301 | t=1762s
+ep  1380 | phase=B | rev=$19.80 | vio=  0 | buf=30000 | alpha=0.1344 | t=1775s
+ep  1390 | phase=B | rev=$54.37 | vio=  0 | buf=30000 | alpha=0.1387 | t=1788s
+ep  1400 | phase=B | rev=$462.44 | vio=  5 | buf=30000 | alpha=0.1433 | t=1801s
+  [EVAL] ep  1400 | val=$90.90/day | phase=B | best=$370.71 | t=1802s
+ep  1410 | phase=B | rev=$179.40 | vio=  4 | buf=30000 | alpha=0.1479 | t=1815s
+ep  1420 | phase=B | rev=$203.08 | vio=  2 | buf=30000 | alpha=0.1527 | t=1828s
+ep  1430 | phase=B | rev=$34.95 | vio=  1 | buf=30000 | alpha=0.1577 | t=1841s
+ep  1440 | phase=B | rev=$142.60 | vio=  3 | buf=30000 | alpha=0.1628 | t=1853s
+ep  1450 | phase=B | rev=$-86.96 | vio=  3 | buf=30000 | alpha=0.1681 | t=1866s
+  [EVAL] ep  1450 | val=$82.32/day | phase=B | best=$370.71 | t=1867s
+ep  1460 | phase=B | rev=$84.27 | vio=  0 | buf=30000 | alpha=0.1736 | t=1880s
+ep  1470 | phase=B | rev=$116.75 | vio=  2 | buf=30000 | alpha=0.1792 | t=1893s
+ep  1480 | phase=B | rev=$80.01 | vio=  3 | buf=30000 | alpha=0.1850 | t=1905s
+ep  1490 | phase=B | rev=$82.72 | vio=  1 | buf=30000 | alpha=0.1903 | t=1918s
+[Phase C] ep 1500: all TTFE params unfrozen (lr=1e-05)
+ep  1500 | phase=C | rev=$151.42 | vio=  5 | buf=30000 | alpha=0.1922 | t=1931s
+  [EVAL] ep  1500 | val=$30.83/day | phase=C | best=$370.71 | t=1932s
+ep  1510 | phase=C | rev=$101.95 | vio=  3 | buf=30000 | alpha=0.1924 | t=1948s
+ep  1520 | phase=C | rev=$69.09 | vio=  0 | buf=30000 | alpha=0.1930 | t=1964s
+ep  1530 | phase=C | rev=$51.84 | vio=  1 | buf=30000 | alpha=0.1935 | t=1980s
+ep  1540 | phase=C | rev=$8.17 | vio=  0 | buf=30000 | alpha=0.1985 | t=1997s
+ep  1550 | phase=C | rev=$213.46 | vio=  4 | buf=30000 | alpha=0.2072 | t=2013s
+  [EVAL] ep  1550 | val=$60.60/day | phase=C | best=$370.71 | t=2014s
+ep  1560 | phase=C | rev=$1869.07 | vio= 13 | buf=30000 | alpha=0.2147 | t=2030s
+ep  1570 | phase=C | rev=$934.60 | vio= 12 | buf=30000 | alpha=0.2197 | t=2046s
+ep  1580 | phase=C | rev=$-112.80 | vio=  2 | buf=30000 | alpha=0.2230 | t=2062s
+ep  1590 | phase=C | rev=$3647.33 | vio= 13 | buf=30000 | alpha=0.2208 | t=2078s
+ep  1600 | phase=C | rev=$12.19 | vio=  0 | buf=30000 | alpha=0.2138 | t=2094s
+  [EVAL] ep  1600 | val=$-7.01/day | phase=C | best=$370.71 | t=2095s
+ep  1610 | phase=C | rev=$-89.00 | vio=  1 | buf=30000 | alpha=0.2065 | t=2111s
+ep  1620 | phase=C | rev=$-76.01 | vio=  1 | buf=30000 | alpha=0.2008 | t=2128s
+ep  1630 | phase=C | rev=$-64.51 | vio=  0 | buf=30000 | alpha=0.1963 | t=2144s
+ep  1640 | phase=C | rev=$102.87 | vio=  3 | buf=30000 | alpha=0.1949 | t=2160s
+ep  1650 | phase=C | rev=$64.89 | vio=  1 | buf=30000 | alpha=0.1923 | t=2176s
+  [EVAL] ep  1650 | val=$53.18/day | phase=C | best=$370.71 | t=2177s
+ep  1660 | phase=C | rev=$-34.58 | vio=  0 | buf=30000 | alpha=0.1896 | t=2193s
+ep  1670 | phase=C | rev=$261.97 | vio=  6 | buf=30000 | alpha=0.1868 | t=2209s
+ep  1680 | phase=C | rev=$47.34 | vio=  0 | buf=30000 | alpha=0.1851 | t=2225s
+ep  1690 | phase=C | rev=$100.27 | vio=  2 | buf=30000 | alpha=0.1850 | t=2241s
+ep  1700 | phase=C | rev=$-21.30 | vio=  0 | buf=30000 | alpha=0.1877 | t=2257s
+  [EVAL] ep  1700 | val=$14.73/day | phase=C | best=$370.71 | t=2258s
+ep  1710 | phase=C | rev=$-17.19 | vio=  0 | buf=30000 | alpha=0.1911 | t=2274s
+ep  1720 | phase=C | rev=$57.96 | vio=  1 | buf=30000 | alpha=0.1924 | t=2290s
+ep  1730 | phase=C | rev=$20.82 | vio=  0 | buf=30000 | alpha=0.1957 | t=2306s
+ep  1740 | phase=C | rev=$8.69 | vio=  0 | buf=30000 | alpha=0.1981 | t=2322s
+ep  1750 | phase=C | rev=$419.15 | vio= 11 | buf=30000 | alpha=0.1987 | t=2339s
+  [EVAL] ep  1750 | val=$42.12/day | phase=C | best=$370.71 | t=2340s
+ep  1760 | phase=C | rev=$279.45 | vio=  2 | buf=30000 | alpha=0.1983 | t=2356s
+ep  1770 | phase=C | rev=$104.20 | vio=  1 | buf=30000 | alpha=0.1945 | t=2372s
+ep  1780 | phase=C | rev=$1824.70 | vio= 13 | buf=30000 | alpha=0.1936 | t=2388s
+ep  1790 | phase=C | rev=$86.56 | vio=  0 | buf=30000 | alpha=0.1948 | t=2404s
+ep  1800 | phase=C | rev=$-69.83 | vio=  0 | buf=30000 | alpha=0.1969 | t=2420s
+  [EVAL] ep  1800 | val=$15.81/day | phase=C | best=$370.71 | t=2422s
+ep  1810 | phase=C | rev=$485.31 | vio= 10 | buf=30000 | alpha=0.1978 | t=2438s
+ep  1820 | phase=C | rev=$337.10 | vio=  9 | buf=30000 | alpha=0.2000 | t=2454s
+ep  1830 | phase=C | rev=$-27.70 | vio=  2 | buf=30000 | alpha=0.2035 | t=2470s
+ep  1840 | phase=C | rev=$76.80 | vio=  0 | buf=30000 | alpha=0.2078 | t=2486s
+ep  1850 | phase=C | rev=$211.09 | vio=  2 | buf=30000 | alpha=0.2142 | t=2502s
+  [EVAL] ep  1850 | val=$33.90/day | phase=C | best=$370.71 | t=2503s
+ep  1860 | phase=C | rev=$-16.42 | vio=  0 | buf=30000 | alpha=0.2228 | t=2519s
+ep  1870 | phase=C | rev=$-30.23 | vio=  0 | buf=30000 | alpha=0.2322 | t=2535s
+ep  1880 | phase=C | rev=$2219.33 | vio= 10 | buf=30000 | alpha=0.2401 | t=2551s
+ep  1890 | phase=C | rev=$-34.75 | vio=  0 | buf=30000 | alpha=0.2457 | t=2567s
+ep  1900 | phase=C | rev=$14.05 | vio=  0 | buf=30000 | alpha=0.2495 | t=2583s
+  [EVAL] ep  1900 | val=$15.37/day | phase=C | best=$370.71 | t=2584s
+ep  1910 | phase=C | rev=$-39.46 | vio=  0 | buf=30000 | alpha=0.2510 | t=2600s
+ep  1920 | phase=C | rev=$29.12 | vio=  0 | buf=30000 | alpha=0.2494 | t=2617s
+ep  1930 | phase=C | rev=$229.48 | vio=  3 | buf=30000 | alpha=0.2468 | t=2633s
+ep  1940 | phase=C | rev=$-106.65 | vio=  0 | buf=30000 | alpha=0.2416 | t=2649s
+ep  1950 | phase=C | rev=$-75.65 | vio= 14 | buf=30000 | alpha=0.2340 | t=2665s
+  [EVAL] ep  1950 | val=$9.43/day | phase=C | best=$370.71 | t=2666s
+ep  1960 | phase=C | rev=$13.28 | vio=  0 | buf=30000 | alpha=0.2273 | t=2682s
+ep  1970 | phase=C | rev=$6.77 | vio=  0 | buf=30000 | alpha=0.2221 | t=2698s
+ep  1980 | phase=C | rev=$-13.78 | vio=  0 | buf=30000 | alpha=0.2190 | t=2714s
+ep  1990 | phase=C | rev=$-69.01 | vio=  0 | buf=30000 | alpha=0.2157 | t=2730s
+ep  2000 | phase=C | rev=$26.40 | vio=  0 | buf=30000 | alpha=0.2123 | t=2746s
+  [EVAL] ep  2000 | val=$18.45/day | phase=C | best=$370.71 | t=2747s
+ep  2010 | phase=C | rev=$92.82 | vio=  1 | buf=30000 | alpha=0.2103 | t=2764s
+ep  2020 | phase=C | rev=$-100.86 | vio= 20 | buf=30000 | alpha=0.2103 | t=2780s
+ep  2030 | phase=C | rev=$-38.02 | vio=  0 | buf=30000 | alpha=0.2092 | t=2796s
+ep  2040 | phase=C | rev=$-55.79 | vio=  0 | buf=30000 | alpha=0.2056 | t=2812s
+ep  2050 | phase=C | rev=$-23.89 | vio=  0 | buf=30000 | alpha=0.2011 | t=2828s
+  [EVAL] ep  2050 | val=$8.11/day | phase=C | best=$370.71 | t=2829s
+ep  2060 | phase=C | rev=$-54.24 | vio=  0 | buf=30000 | alpha=0.1953 | t=2845s
+ep  2070 | phase=C | rev=$-52.42 | vio=  0 | buf=30000 | alpha=0.1902 | t=2861s
+ep  2080 | phase=C | rev=$1014.87 | vio=  6 | buf=30000 | alpha=0.1840 | t=2877s
+ep  2090 | phase=C | rev=$-49.88 | vio=  0 | buf=30000 | alpha=0.1786 | t=2893s
+ep  2100 | phase=C | rev=$-85.49 | vio=  0 | buf=30000 | alpha=0.1740 | t=2910s
+  [EVAL] ep  2100 | val=$-20.56/day | phase=C | best=$370.71 | t=2911s
+ep  2110 | phase=C | rev=$74.89 | vio=  0 | buf=30000 | alpha=0.1711 | t=2927s
+ep  2120 | phase=C | rev=$-54.27 | vio=  0 | buf=30000 | alpha=0.1701 | t=2943s
+ep  2130 | phase=C | rev=$-42.65 | vio=  0 | buf=30000 | alpha=0.1685 | t=2959s
+ep  2140 | phase=C | rev=$-83.95 | vio= 12 | buf=30000 | alpha=0.1686 | t=2975s
+ep  2150 | phase=C | rev=$-38.90 | vio=  0 | buf=30000 | alpha=0.1691 | t=2991s
+  [EVAL] ep  2150 | val=$-30.99/day | phase=C | best=$370.71 | t=2992s
+ep  2160 | phase=C | rev=$69.66 | vio=  0 | buf=30000 | alpha=0.1692 | t=3008s
+ep  2170 | phase=C | rev=$1558.26 | vio= 12 | buf=30000 | alpha=0.1699 | t=3024s
+ep  2180 | phase=C | rev=$1167.21 | vio=  3 | buf=30000 | alpha=0.1716 | t=3040s
+ep  2190 | phase=C | rev=$-121.44 | vio= 10 | buf=30000 | alpha=0.1744 | t=3056s
+ep  2200 | phase=C | rev=$969.47 | vio=  1 | buf=30000 | alpha=0.1767 | t=3072s
+  [EVAL] ep  2200 | val=$-29.67/day | phase=C | best=$370.71 | t=3074s
+ep  2210 | phase=C | rev=$-73.39 | vio=  0 | buf=30000 | alpha=0.1782 | t=3090s
+ep  2220 | phase=C | rev=$-48.77 | vio=  3 | buf=30000 | alpha=0.1787 | t=3106s
+ep  2230 | phase=C | rev=$-121.03 | vio= 47 | buf=30000 | alpha=0.1787 | t=3122s
+ep  2240 | phase=C | rev=$-109.03 | vio=  1 | buf=30000 | alpha=0.1789 | t=3138s
+ep  2250 | phase=C | rev=$9995.87 | vio= 13 | buf=30000 | alpha=0.1796 | t=3154s
+  [EVAL] ep  2250 | val=$-28.39/day | phase=C | best=$370.71 | t=3155s
+ep  2260 | phase=C | rev=$-73.07 | vio= 22 | buf=30000 | alpha=0.1823 | t=3171s
+ep  2270 | phase=C | rev=$-57.39 | vio=  0 | buf=30000 | alpha=0.1844 | t=3187s
+ep  2280 | phase=C | rev=$-14.85 | vio=  0 | buf=30000 | alpha=0.1852 | t=3203s
+ep  2290 | phase=C | rev=$-104.65 | vio=  2 | buf=30000 | alpha=0.1854 | t=3219s
+ep  2300 | phase=C | rev=$471.02 | vio=  7 | buf=30000 | alpha=0.1835 | t=3235s
+  [EVAL] ep  2300 | val=$-10.23/day | phase=C | best=$370.71 | t=3237s
+ep  2310 | phase=C | rev=$73.84 | vio=  0 | buf=30000 | alpha=0.1825 | t=3253s
+ep  2320 | phase=C | rev=$-72.93 | vio=  0 | buf=30000 | alpha=0.1797 | t=3269s
+ep  2330 | phase=C | rev=$-50.84 | vio=  0 | buf=30000 | alpha=0.1772 | t=3285s
+ep  2340 | phase=C | rev=$-199.73 | vio= 26 | buf=30000 | alpha=0.1735 | t=3301s
+ep  2350 | phase=C | rev=$-197.42 | vio= 13 | buf=30000 | alpha=0.1706 | t=3317s
+  [EVAL] ep  2350 | val=$-40.21/day | phase=C | best=$370.71 | t=3318s
+ep  2360 | phase=C | rev=$541.10 | vio=  7 | buf=30000 | alpha=0.1688 | t=3334s
+ep  2370 | phase=C | rev=$-59.15 | vio=  0 | buf=30000 | alpha=0.1673 | t=3350s
+ep  2380 | phase=C | rev=$-106.94 | vio=  0 | buf=30000 | alpha=0.1668 | t=3366s
+ep  2390 | phase=C | rev=$-56.07 | vio=  0 | buf=30000 | alpha=0.1672 | t=3382s
+ep  2400 | phase=C | rev=$-51.41 | vio=  0 | buf=30000 | alpha=0.1672 | t=3398s
+  [EVAL] ep  2400 | val=$-23.93/day | phase=C | best=$370.71 | t=3399s
+ep  2410 | phase=C | rev=$-125.61 | vio=  1 | buf=30000 | alpha=0.1671 | t=3415s
+ep  2420 | phase=C | rev=$-48.61 | vio=  0 | buf=30000 | alpha=0.1672 | t=3432s
+ep  2430 | phase=C | rev=$-41.08 | vio=  0 | buf=30000 | alpha=0.1670 | t=3448s
+ep  2440 | phase=C | rev=$-38.67 | vio=  0 | buf=30000 | alpha=0.1682 | t=3464s
+ep  2450 | phase=C | rev=$-33.09 | vio=  0 | buf=30000 | alpha=0.1687 | t=3480s
+  [EVAL] ep  2450 | val=$0.40/day | phase=C | best=$370.71 | t=3481s
+ep  2460 | phase=C | rev=$-35.67 | vio=  0 | buf=30000 | alpha=0.1666 | t=3497s
+ep  2470 | phase=C | rev=$-105.73 | vio=  0 | buf=30000 | alpha=0.1652 | t=3513s
+ep  2480 | phase=C | rev=$-25.41 | vio=  0 | buf=30000 | alpha=0.1629 | t=3529s
+ep  2490 | phase=C | rev=$-27.54 | vio=  0 | buf=30000 | alpha=0.1590 | t=3545s
+ep  2500 | phase=C | rev=$-48.41 | vio=  0 | buf=30000 | alpha=0.1552 | t=3561s
+  [EVAL] ep  2500 | val=$-4.44/day | phase=C | best=$370.71 | t=3563s
+ep  2510 | phase=C | rev=$254.08 | vio=  5 | buf=30000 | alpha=0.1543 | t=3579s
+ep  2520 | phase=C | rev=$1039.30 | vio=  5 | buf=30000 | alpha=0.1551 | t=3595s
+ep  2530 | phase=C | rev=$-49.61 | vio=  0 | buf=30000 | alpha=0.1569 | t=3611s
+ep  2540 | phase=C | rev=$137.75 | vio=  3 | buf=30000 | alpha=0.1593 | t=3627s
+ep  2550 | phase=C | rev=$-105.71 | vio=  0 | buf=30000 | alpha=0.1614 | t=3643s
+  [EVAL] ep  2550 | val=$-18.56/day | phase=C | best=$370.71 | t=3644s
+ep  2560 | phase=C | rev=$-67.95 | vio=  0 | buf=30000 | alpha=0.1647 | t=3660s
+ep  2570 | phase=C | rev=$392.24 | vio=  2 | buf=30000 | alpha=0.1689 | t=3676s
+ep  2580 | phase=C | rev=$-32.66 | vio=  0 | buf=30000 | alpha=0.1736 | t=3692s
+ep  2590 | phase=C | rev=$56.38 | vio=  0 | buf=30000 | alpha=0.1794 | t=3708s
+ep  2600 | phase=C | rev=$-92.84 | vio=  0 | buf=30000 | alpha=0.1860 | t=3724s
+  [EVAL] ep  2600 | val=$-17.92/day | phase=C | best=$370.71 | t=3726s
+ep  2610 | phase=C | rev=$-103.58 | vio=  0 | buf=30000 | alpha=0.1927 | t=3742s
+ep  2620 | phase=C | rev=$7.94 | vio=  0 | buf=30000 | alpha=0.1985 | t=3758s
+ep  2630 | phase=C | rev=$-94.02 | vio=  0 | buf=30000 | alpha=0.2039 | t=3774s
+ep  2640 | phase=C | rev=$-172.25 | vio=  0 | buf=30000 | alpha=0.2096 | t=3790s
+ep  2650 | phase=C | rev=$-83.35 | vio=  0 | buf=30000 | alpha=0.2151 | t=3806s
+  [EVAL] ep  2650 | val=$-21.70/day | phase=C | best=$370.71 | t=3807s
+ep  2660 | phase=C | rev=$-31.52 | vio=  0 | buf=30000 | alpha=0.2207 | t=3823s
+ep  2670 | phase=C | rev=$-60.53 | vio=  0 | buf=30000 | alpha=0.2255 | t=3839s
+ep  2680 | phase=C | rev=$324.61 | vio=  5 | buf=30000 | alpha=0.2297 | t=3855s
+ep  2690 | phase=C | rev=$-154.38 | vio=  0 | buf=30000 | alpha=0.2336 | t=3871s
+ep  2700 | phase=C | rev=$-116.22 | vio=  0 | buf=30000 | alpha=0.2364 | t=3887s
+  [EVAL] ep  2700 | val=$-28.83/day | phase=C | best=$370.71 | t=3888s
+ep  2710 | phase=C | rev=$-94.86 | vio=  0 | buf=30000 | alpha=0.2390 | t=3904s
+ep  2720 | phase=C | rev=$-30.49 | vio=  0 | buf=30000 | alpha=0.2427 | t=3921s
+ep  2730 | phase=C | rev=$-154.40 | vio=  0 | buf=30000 | alpha=0.2486 | t=3937s
+ep  2740 | phase=C | rev=$-148.04 | vio=  6 | buf=30000 | alpha=0.2551 | t=3953s
+ep  2750 | phase=C | rev=$-120.07 | vio=  1 | buf=30000 | alpha=0.2610 | t=3969s
+  [EVAL] ep  2750 | val=$-43.30/day | phase=C | best=$370.71 | t=3970s
+ep  2760 | phase=C | rev=$-85.21 | vio=  0 | buf=30000 | alpha=0.2624 | t=3986s
+ep  2770 | phase=C | rev=$5386.09 | vio=  6 | buf=30000 | alpha=0.2625 | t=4002s
+ep  2780 | phase=C | rev=$-30.34 | vio=  0 | buf=30000 | alpha=0.2628 | t=4018s
+ep  2790 | phase=C | rev=$-42.64 | vio=  2 | buf=30000 | alpha=0.2646 | t=4034s
+ep  2800 | phase=C | rev=$-129.06 | vio=  4 | buf=30000 | alpha=0.2659 | t=4061s
+  [EVAL] ep  2800 | val=$-24.35/day | phase=C | best=$370.71 | t=4063s
+ep  2810 | phase=C | rev=$-100.13 | vio=  0 | buf=30000 | alpha=0.2675 | t=4079s
+ep  2820 | phase=C | rev=$-116.24 | vio=  0 | buf=30000 | alpha=0.2686 | t=4095s
+ep  2830 | phase=C | rev=$-149.47 | vio=  0 | buf=30000 | alpha=0.2691 | t=4111s
+ep  2840 | phase=C | rev=$802.28 | vio= 41 | buf=30000 | alpha=0.2674 | t=4127s
+ep  2850 | phase=C | rev=$-115.78 | vio=  0 | buf=30000 | alpha=0.2655 | t=4143s
+  [EVAL] ep  2850 | val=$-20.04/day | phase=C | best=$370.71 | t=4144s
+ep  2860 | phase=C | rev=$-134.06 | vio=  0 | buf=30000 | alpha=0.2668 | t=4160s
+ep  2870 | phase=C | rev=$-158.99 | vio=  0 | buf=30000 | alpha=0.2703 | t=4176s
+[Stage2] ep 2878: violations=54 > 50 (phase=C) — reloading best ckpt + halving actor/critic LRs
+ep  2880 | phase=C | rev=$245.62 | vio= 20 | buf=30000 | alpha=0.0763 | t=4192s
+ep  2890 | phase=C | rev=$372.70 | vio= 19 | buf=30000 | alpha=0.0804 | t=4208s
+ep  2900 | phase=C | rev=$378.67 | vio= 20 | buf=30000 | alpha=0.0839 | t=4225s
+  [EVAL] ep  2900 | val=$289.74/day | phase=C | best=$370.71 | t=4226s
+ep  2910 | phase=C | rev=$314.74 | vio= 20 | buf=30000 | alpha=0.0864 | t=4242s
+ep  2920 | phase=C | rev=$145.72 | vio= 17 | buf=30000 | alpha=0.0836 | t=4258s
+ep  2930 | phase=C | rev=$512.76 | vio= 20 | buf=30000 | alpha=0.0805 | t=4274s
+ep  2940 | phase=C | rev=$244.09 | vio= 10 | buf=30000 | alpha=0.0776 | t=4290s
+ep  2950 | phase=C | rev=$207.06 | vio=  7 | buf=30000 | alpha=0.0750 | t=4306s
+  [EVAL] ep  2950 | val=$133.64/day | phase=C | best=$370.71 | t=4308s
+ep  2960 | phase=C | rev=$3493.23 | vio= 13 | buf=30000 | alpha=0.0725 | t=4324s
+ep  2970 | phase=C | rev=$110.59 | vio=  1 | buf=30000 | alpha=0.0701 | t=4340s
+ep  2980 | phase=C | rev=$149.33 | vio=  1 | buf=30000 | alpha=0.0679 | t=4356s
+ep  2990 | phase=C | rev=$84.64 | vio=  2 | buf=30000 | alpha=0.0657 | t=4372s
+ep  3000 | phase=C | rev=$588.72 | vio= 13 | buf=30000 | alpha=0.0636 | t=4388s
+  [EVAL] ep  3000 | val=$84.13/day | phase=C | best=$370.71 | t=4389s
+ep  3010 | phase=C | rev=$158.35 | vio=  3 | buf=30000 | alpha=0.0617 | t=4405s
+ep  3020 | phase=C | rev=$96.26 | vio=  0 | buf=30000 | alpha=0.0597 | t=4421s
+ep  3030 | phase=C | rev=$15.33 | vio=  0 | buf=30000 | alpha=0.0578 | t=4437s
+[Stage2] ep 3040: violations=68 > 50 (phase=C) — reloading best ckpt + halving actor/critic LRs
+ep  3040 | phase=C | rev=$-67.32 | vio= 68 | buf=30000 | alpha=0.0751 | t=4454s
+ep  3050 | phase=C | rev=$341.00 | vio= 20 | buf=30000 | alpha=0.0776 | t=4470s
+  [EVAL] ep  3050 | val=$355.29/day | phase=C | best=$370.71 | t=4471s
+ep  3060 | phase=C | rev=$2067.83 | vio= 21 | buf=30000 | alpha=0.0802 | t=4487s
+ep  3070 | phase=C | rev=$675.90 | vio= 20 | buf=30000 | alpha=0.0829 | t=4503s
+ep  3080 | phase=C | rev=$431.26 | vio= 20 | buf=30000 | alpha=0.0856 | t=4519s
+ep  3090 | phase=C | rev=$299.35 | vio= 20 | buf=30000 | alpha=0.0884 | t=4536s
+ep  3100 | phase=C | rev=$3943.03 | vio= 22 | buf=30000 | alpha=0.0904 | t=4552s
+  [EVAL] ep  3100 | val=$281.59/day | phase=C | best=$370.71 | t=4553s
+ep  3110 | phase=C | rev=$521.20 | vio= 21 | buf=30000 | alpha=0.0892 | t=4569s
+ep  3120 | phase=C | rev=$650.16 | vio= 20 | buf=30000 | alpha=0.0862 | t=4585s
+ep  3130 | phase=C | rev=$416.59 | vio= 19 | buf=30000 | alpha=0.0832 | t=4601s
+ep  3140 | phase=C | rev=$731.61 | vio= 19 | buf=30000 | alpha=0.0803 | t=4618s
+ep  3150 | phase=C | rev=$296.88 | vio= 18 | buf=30000 | alpha=0.0776 | t=4634s
+  [EVAL] ep  3150 | val=$210.62/day | phase=C | best=$370.71 | t=4635s
+ep  3160 | phase=C | rev=$429.87 | vio= 16 | buf=30000 | alpha=0.0751 | t=4651s
+ep  3170 | phase=C | rev=$338.06 | vio= 10 | buf=30000 | alpha=0.0727 | t=4667s
+ep  3180 | phase=C | rev=$2269.44 | vio= 13 | buf=30000 | alpha=0.0703 | t=4683s
+ep  3190 | phase=C | rev=$643.98 | vio= 11 | buf=30000 | alpha=0.0681 | t=4699s
+ep  3200 | phase=C | rev=$157.50 | vio=  2 | buf=30000 | alpha=0.0659 | t=4715s
+  [EVAL] ep  3200 | val=$106.90/day | phase=C | best=$370.71 | t=4717s
+ep  3210 | phase=C | rev=$216.74 | vio=  4 | buf=30000 | alpha=0.0638 | t=4733s
+ep  3220 | phase=C | rev=$2310.75 | vio= 13 | buf=30000 | alpha=0.0618 | t=4749s
+ep  3230 | phase=C | rev=$599.02 | vio= 12 | buf=30000 | alpha=0.0598 | t=4765s
+ep  3240 | phase=C | rev=$2273.89 | vio= 22 | buf=30000 | alpha=0.0580 | t=4781s
+ep  3250 | phase=C | rev=$198.79 | vio=  4 | buf=30000 | alpha=0.0570 | t=4797s
+  [EVAL] ep  3250 | val=$98.41/day | phase=C | best=$370.71 | t=4798s
+ep  3260 | phase=C | rev=$517.20 | vio= 12 | buf=30000 | alpha=0.0578 | t=4814s
+ep  3270 | phase=C | rev=$337.68 | vio=  8 | buf=30000 | alpha=0.0599 | t=4830s
+ep  3280 | phase=C | rev=$2220.63 | vio= 14 | buf=30000 | alpha=0.0621 | t=4847s
+ep  3290 | phase=C | rev=$742.56 | vio= 22 | buf=30000 | alpha=0.0643 | t=4863s
+ep  3300 | phase=C | rev=$2168.44 | vio= 16 | buf=30000 | alpha=0.0664 | t=4881s
+  [EVAL] ep  3300 | val=$168.98/day | phase=C | best=$370.71 | t=4883s
+ep  3310 | phase=C | rev=$788.76 | vio= 14 | buf=30000 | alpha=0.0676 | t=4901s
+ep  3320 | phase=C | rev=$151.34 | vio=  5 | buf=30000 | alpha=0.0674 | t=4919s
+ep  3330 | phase=C | rev=$366.12 | vio= 13 | buf=30000 | alpha=0.0661 | t=4938s
+[Stage2] ep 3340: violations=62 > 50 (phase=C) — reloading best ckpt + halving actor/critic LRs
+ep  3340 | phase=C | rev=$-42.40 | vio= 62 | buf=30000 | alpha=0.0752 | t=4956s
+ep  3350 | phase=C | rev=$379.98 | vio= 20 | buf=30000 | alpha=0.0785 | t=4975s
+  [EVAL] ep  3350 | val=$356.71/day | phase=C | best=$370.71 | t=4976s
+ep  3360 | phase=C | rev=$298.70 | vio= 20 | buf=30000 | alpha=0.0816 | t=4995s
+ep  3370 | phase=C | rev=$272.36 | vio= 20 | buf=30000 | alpha=0.0847 | t=5013s
+ep  3380 | phase=C | rev=$273.65 | vio= 20 | buf=30000 | alpha=0.0877 | t=5032s
+ep  3390 | phase=C | rev=$475.56 | vio= 21 | buf=30000 | alpha=0.0908 | t=5050s
+ep  3400 | phase=C | rev=$355.47 | vio= 21 | buf=30000 | alpha=0.0934 | t=5069s
+  [EVAL] ep  3400 | val=$304.01/day | phase=C | best=$370.71 | t=5070s
+ep  3410 | phase=C | rev=$473.05 | vio= 21 | buf=30000 | alpha=0.0929 | t=5088s
+ep  3420 | phase=C | rev=$299.43 | vio= 17 | buf=30000 | alpha=0.0898 | t=5107s
+ep  3430 | phase=C | rev=$542.76 | vio= 19 | buf=30000 | alpha=0.0865 | t=5125s
+ep  3440 | phase=C | rev=$337.55 | vio= 15 | buf=30000 | alpha=0.0835 | t=5144s
+ep  3450 | phase=C | rev=$190.36 | vio=  9 | buf=30000 | alpha=0.0807 | t=5162s
+  [EVAL] ep  3450 | val=$233.84/day | phase=C | best=$370.71 | t=5163s
+ep  3460 | phase=C | rev=$378.73 | vio= 20 | buf=30000 | alpha=0.0781 | t=5182s
+ep  3470 | phase=C | rev=$290.29 | vio= 23 | buf=30000 | alpha=0.0755 | t=5200s
+ep  3480 | phase=C | rev=$239.42 | vio=  8 | buf=30000 | alpha=0.0731 | t=5219s
+ep  3490 | phase=C | rev=$203.25 | vio=  5 | buf=30000 | alpha=0.0708 | t=5237s
+ep  3500 | phase=C | rev=$286.02 | vio=  6 | buf=30000 | alpha=0.0685 | t=5256s
+  [EVAL] ep  3500 | val=$104.62/day | phase=C | best=$370.71 | t=5257s
+ep  3510 | phase=C | rev=$175.95 | vio=  7 | buf=30000 | alpha=0.0663 | t=5276s
+ep  3520 | phase=C | rev=$-11.98 | vio= 12 | buf=30000 | alpha=0.0642 | t=5294s
+ep  3530 | phase=C | rev=$51.44 | vio=  0 | buf=30000 | alpha=0.0622 | t=5313s
+[Stage2] ep 3538: violations=94 > 50 (phase=C) — reloading best ckpt + halving actor/critic LRs
+ep  3540 | phase=C | rev=$305.78 | vio= 21 | buf=30000 | alpha=0.0756 | t=5331s
+ep  3550 | phase=C | rev=$492.11 | vio= 20 | buf=30000 | alpha=0.0780 | t=5350s
+  [EVAL] ep  3550 | val=$353.28/day | phase=C | best=$370.71 | t=5351s
+ep  3560 | phase=C | rev=$471.57 | vio= 20 | buf=30000 | alpha=0.0806 | t=5369s
+ep  3570 | phase=C | rev=$831.01 | vio= 20 | buf=30000 | alpha=0.0832 | t=5388s
+ep  3580 | phase=C | rev=$335.23 | vio= 20 | buf=30000 | alpha=0.0859 | t=5406s
+ep  3590 | phase=C | rev=$366.25 | vio= 18 | buf=30000 | alpha=0.0887 | t=5425s
+ep  3600 | phase=C | rev=$199.22 | vio= 19 | buf=30000 | alpha=0.0916 | t=5443s
+  [EVAL] ep  3600 | val=$289.16/day | phase=C | best=$370.71 | t=5444s
+ep  3610 | phase=C | rev=$315.51 | vio= 19 | buf=30000 | alpha=0.0929 | t=5462s
+ep  3620 | phase=C | rev=$188.99 | vio= 19 | buf=30000 | alpha=0.0906 | t=5480s
+ep  3630 | phase=C | rev=$232.72 | vio= 18 | buf=30000 | alpha=0.0874 | t=5499s
+ep  3640 | phase=C | rev=$197.95 | vio= 10 | buf=30000 | alpha=0.0845 | t=5517s
+ep  3650 | phase=C | rev=$159.91 | vio= 10 | buf=30000 | alpha=0.0816 | t=5534s
+  [EVAL] ep  3650 | val=$153.65/day | phase=C | best=$370.71 | t=5535s
+ep  3660 | phase=C | rev=$210.63 | vio=  7 | buf=30000 | alpha=0.0790 | t=5552s
+ep  3670 | phase=C | rev=$130.53 | vio=  6 | buf=30000 | alpha=0.0764 | t=5569s
+ep  3680 | phase=C | rev=$1953.39 | vio= 13 | buf=30000 | alpha=0.0739 | t=5588s
+ep  3690 | phase=C | rev=$553.72 | vio= 13 | buf=30000 | alpha=0.0716 | t=5606s
+ep  3700 | phase=C | rev=$233.83 | vio=  6 | buf=30000 | alpha=0.0693 | t=5625s
+  [EVAL] ep  3700 | val=$118.21/day | phase=C | best=$370.71 | t=5626s
+ep  3710 | phase=C | rev=$258.89 | vio=  7 | buf=30000 | alpha=0.0671 | t=5644s
+ep  3720 | phase=C | rev=$72.25 | vio=  0 | buf=30000 | alpha=0.0650 | t=5663s
+ep  3730 | phase=C | rev=$433.78 | vio= 14 | buf=30000 | alpha=0.0629 | t=5681s
+ep  3740 | phase=C | rev=$180.30 | vio=  5 | buf=30000 | alpha=0.0610 | t=5699s
+ep  3750 | phase=C | rev=$204.38 | vio=  7 | buf=30000 | alpha=0.0592 | t=5717s
+  [EVAL] ep  3750 | val=$100.40/day | phase=C | best=$370.71 | t=5719s
+ep  3760 | phase=C | rev=$386.38 | vio= 10 | buf=30000 | alpha=0.0574 | t=5737s
+ep  3770 | phase=C | rev=$334.27 | vio= 10 | buf=30000 | alpha=0.0557 | t=5755s
+ep  3780 | phase=C | rev=$2664.34 | vio= 22 | buf=30000 | alpha=0.0541 | t=5774s
+ep  3790 | phase=C | rev=$147.76 | vio=  4 | buf=30000 | alpha=0.0528 | t=5792s
+ep  3800 | phase=C | rev=$910.35 | vio= 14 | buf=30000 | alpha=0.0518 | t=5808s
+  [EVAL] ep  3800 | val=$74.57/day | phase=C | best=$370.71 | t=5809s
+ep  3810 | phase=C | rev=$278.20 | vio= 11 | buf=30000 | alpha=0.0512 | t=5825s
+ep  3820 | phase=C | rev=$-51.77 | vio= 42 | buf=30000 | alpha=0.0508 | t=5842s
+ep  3830 | phase=C | rev=$152.59 | vio=  6 | buf=30000 | alpha=0.0509 | t=5858s
+ep  3840 | phase=C | rev=$118.83 | vio=  4 | buf=30000 | alpha=0.0513 | t=5874s
+ep  3850 | phase=C | rev=$37.54 | vio=  2 | buf=30000 | alpha=0.0524 | t=5890s
+  [EVAL] ep  3850 | val=$93.21/day | phase=C | best=$370.71 | t=5891s
+ep  3860 | phase=C | rev=$285.76 | vio=  8 | buf=30000 | alpha=0.0537 | t=5907s
+ep  3870 | phase=C | rev=$1710.70 | vio= 21 | buf=30000 | alpha=0.0557 | t=5923s
+ep  3880 | phase=C | rev=$348.96 | vio= 12 | buf=30000 | alpha=0.0580 | t=5939s
+ep  3890 | phase=C | rev=$754.17 | vio= 18 | buf=30000 | alpha=0.0603 | t=5955s
+ep  3900 | phase=C | rev=$-52.84 | vio=  8 | buf=30000 | alpha=0.0623 | t=5972s
+  [EVAL] ep  3900 | val=$45.51/day | phase=C | best=$370.71 | t=5973s
+ep  3910 | phase=C | rev=$88.21 | vio=  1 | buf=30000 | alpha=0.0643 | t=5989s
+ep  3920 | phase=C | rev=$36.71 | vio=  2 | buf=30000 | alpha=0.0665 | t=6005s
+ep  3930 | phase=C | rev=$75.61 | vio=  1 | buf=30000 | alpha=0.0684 | t=6021s
+ep  3940 | phase=C | rev=$-71.23 | vio= 10 | buf=30000 | alpha=0.0700 | t=6037s
+ep  3950 | phase=C | rev=$-44.02 | vio=  3 | buf=30000 | alpha=0.0710 | t=6053s
+  [EVAL] ep  3950 | val=$-6.20/day | phase=C | best=$370.71 | t=6054s
+ep  3960 | phase=C | rev=$-109.47 | vio=  3 | buf=30000 | alpha=0.0707 | t=6070s
+ep  3970 | phase=C | rev=$-2.07 | vio= 30 | buf=30000 | alpha=0.0695 | t=6086s
+ep  3980 | phase=C | rev=$476.50 | vio= 12 | buf=30000 | alpha=0.0678 | t=6103s
+[Stage2] ep 3981: violations=75 > 50 (phase=C) — reloading best ckpt + halving actor/critic LRs
+ep  3990 | phase=C | rev=$402.65 | vio= 21 | buf=30000 | alpha=0.0788 | t=6119s
+ep  4000 | phase=C | rev=$402.97 | vio= 21 | buf=30000 | alpha=0.0823 | t=6135s
+  [EVAL] ep  4000 | val=$356.74/day | phase=C | best=$370.71 | t=6136s
+ep  4010 | phase=C | rev=$669.50 | vio= 21 | buf=30000 | alpha=0.0856 | t=6152s
+ep  4020 | phase=C | rev=$448.35 | vio= 21 | buf=30000 | alpha=0.0888 | t=6168s
+ep  4030 | phase=C | rev=$508.93 | vio= 20 | buf=30000 | alpha=0.0920 | t=6184s
+ep  4040 | phase=C | rev=$338.17 | vio= 21 | buf=30000 | alpha=0.0952 | t=6200s
+ep  4050 | phase=C | rev=$401.64 | vio= 18 | buf=30000 | alpha=0.0964 | t=6216s
+  [EVAL] ep  4050 | val=$301.09/day | phase=C | best=$370.71 | t=6217s
+ep  4060 | phase=C | rev=$246.45 | vio= 20 | buf=30000 | alpha=0.0938 | t=6233s
+ep  4070 | phase=C | rev=$409.59 | vio= 17 | buf=30000 | alpha=0.0904 | t=6249s
+ep  4080 | phase=C | rev=$480.25 | vio= 19 | buf=30000 | alpha=0.0872 | t=6265s
+ep  4090 | phase=C | rev=$237.38 | vio= 18 | buf=30000 | alpha=0.0843 | t=6282s
+ep  4100 | phase=C | rev=$408.05 | vio= 11 | buf=30000 | alpha=0.0815 | t=6298s
+  [EVAL] ep  4100 | val=$213.77/day | phase=C | best=$370.71 | t=6299s
+ep  4110 | phase=C | rev=$419.76 | vio= 19 | buf=30000 | alpha=0.0788 | t=6315s
+ep  4120 | phase=C | rev=$-1.35 | vio=  4 | buf=30000 | alpha=0.0763 | t=6331s
+ep  4130 | phase=C | rev=$364.59 | vio= 10 | buf=30000 | alpha=0.0738 | t=6347s
+ep  4140 | phase=C | rev=$423.40 | vio= 15 | buf=30000 | alpha=0.0715 | t=6364s
+ep  4150 | phase=C | rev=$2114.49 | vio= 18 | buf=30000 | alpha=0.0692 | t=6380s
+  [EVAL] ep  4150 | val=$148.18/day | phase=C | best=$370.71 | t=6381s
+ep  4160 | phase=C | rev=$728.86 | vio= 16 | buf=30000 | alpha=0.0673 | t=6397s
+ep  4170 | phase=C | rev=$383.00 | vio= 11 | buf=30000 | alpha=0.0658 | t=6413s
+ep  4180 | phase=C | rev=$164.47 | vio=  6 | buf=30000 | alpha=0.0646 | t=6430s
+ep  4190 | phase=C | rev=$103.78 | vio=  2 | buf=30000 | alpha=0.0642 | t=6448s
+ep  4200 | phase=C | rev=$259.71 | vio= 10 | buf=30000 | alpha=0.0641 | t=6466s
+  [EVAL] ep  4200 | val=$157.15/day | phase=C | best=$370.71 | t=6468s
+ep  4210 | phase=C | rev=$757.53 | vio= 18 | buf=30000 | alpha=0.0644 | t=6486s
+ep  4220 | phase=C | rev=$332.01 | vio= 13 | buf=30000 | alpha=0.0642 | t=6504s
+ep  4230 | phase=C | rev=$328.89 | vio= 12 | buf=30000 | alpha=0.0640 | t=6522s
+ep  4240 | phase=C | rev=$14728.97 | vio= 21 | buf=30000 | alpha=0.0636 | t=6540s
+ep  4250 | phase=C | rev=$235.96 | vio= 11 | buf=30000 | alpha=0.0632 | t=6559s
+  [EVAL] ep  4250 | val=$117.53/day | phase=C | best=$370.71 | t=6560s
+ep  4260 | phase=C | rev=$344.88 | vio= 13 | buf=30000 | alpha=0.0629 | t=6578s
+ep  4270 | phase=C | rev=$86.87 | vio=  3 | buf=30000 | alpha=0.0620 | t=6596s
+ep  4280 | phase=C | rev=$2988.50 | vio= 22 | buf=30000 | alpha=0.0608 | t=6615s
+ep  4290 | phase=C | rev=$-39.32 | vio=  7 | buf=30000 | alpha=0.0598 | t=6633s
+ep  4300 | phase=C | rev=$-27.08 | vio=  4 | buf=30000 | alpha=0.0587 | t=6651s
+  [EVAL] ep  4300 | val=$49.06/day | phase=C | best=$370.71 | t=6652s
+ep  4310 | phase=C | rev=$-106.83 | vio= 22 | buf=30000 | alpha=0.0589 | t=6670s
+ep  4320 | phase=C | rev=$564.70 | vio= 15 | buf=30000 | alpha=0.0599 | t=6689s
+ep  4330 | phase=C | rev=$109.63 | vio=  4 | buf=30000 | alpha=0.0612 | t=6706s
+[Stage2] ep 4339: violations=74 > 50 (phase=C) — reloading best ckpt + halving actor/critic LRs
+ep  4340 | phase=C | rev=$2222.68 | vio= 21 | buf=30000 | alpha=0.0760 | t=6725s
+ep  4350 | phase=C | rev=$2308.15 | vio= 22 | buf=30000 | alpha=0.0807 | t=6743s
+  [EVAL] ep  4350 | val=$357.86/day | phase=C | best=$370.71 | t=6745s
+ep  4360 | phase=C | rev=$3259.30 | vio= 28 | buf=30000 | alpha=0.0845 | t=6763s
+ep  4370 | phase=C | rev=$295.71 | vio= 20 | buf=30000 | alpha=0.0880 | t=6781s
+ep  4380 | phase=C | rev=$364.64 | vio= 21 | buf=30000 | alpha=0.0913 | t=6800s
+ep  4390 | phase=C | rev=$369.32 | vio= 21 | buf=30000 | alpha=0.0946 | t=6818s
+ep  4400 | phase=C | rev=$3090.14 | vio= 20 | buf=30000 | alpha=0.0979 | t=6836s
+  [EVAL] ep  4400 | val=$309.27/day | phase=C | best=$370.71 | t=6838s
+ep  4410 | phase=C | rev=$357.82 | vio= 18 | buf=30000 | alpha=0.0994 | t=6856s
+ep  4420 | phase=C | rev=$493.81 | vio= 19 | buf=30000 | alpha=0.0966 | t=6874s
+ep  4430 | phase=C | rev=$359.31 | vio= 16 | buf=30000 | alpha=0.0931 | t=6892s
+ep  4440 | phase=C | rev=$293.75 | vio= 14 | buf=30000 | alpha=0.0899 | t=6910s
+ep  4450 | phase=C | rev=$175.30 | vio= 11 | buf=30000 | alpha=0.0869 | t=6928s
+  [EVAL] ep  4450 | val=$225.38/day | phase=C | best=$370.71 | t=6929s
+ep  4460 | phase=C | rev=$442.68 | vio= 19 | buf=30000 | alpha=0.0840 | t=6948s
+ep  4470 | phase=C | rev=$281.64 | vio= 10 | buf=30000 | alpha=0.0813 | t=6966s
+ep  4480 | phase=C | rev=$229.65 | vio= 12 | buf=30000 | alpha=0.0786 | t=6984s
+ep  4490 | phase=C | rev=$32.08 | vio=  0 | buf=30000 | alpha=0.0761 | t=7002s
+ep  4500 | phase=C | rev=$97.48 | vio=  0 | buf=30000 | alpha=0.0737 | t=7020s
+  [EVAL] ep  4500 | val=$42.90/day | phase=C | best=$370.71 | t=7022s
+ep  4510 | phase=C | rev=$172.92 | vio=  1 | buf=30000 | alpha=0.0713 | t=7040s
+[Stage2] ep 4512: violations=57 > 50 (phase=C) — reloading best ckpt + halving actor/critic LRs
+ep  4520 | phase=C | rev=$828.12 | vio= 21 | buf=30000 | alpha=0.0770 | t=7059s
+ep  4530 | phase=C | rev=$618.72 | vio= 20 | buf=30000 | alpha=0.0796 | t=7077s
+ep  4540 | phase=C | rev=$550.02 | vio= 20 | buf=30000 | alpha=0.0822 | t=7095s
+ep  4550 | phase=C | rev=$326.48 | vio= 20 | buf=30000 | alpha=0.0848 | t=7113s
+  [EVAL] ep  4550 | val=$323.40/day | phase=C | best=$370.71 | t=7114s
+ep  4560 | phase=C | rev=$782.82 | vio= 20 | buf=30000 | alpha=0.0876 | t=7133s
+ep  4570 | phase=C | rev=$449.60 | vio= 19 | buf=30000 | alpha=0.0905 | t=7151s
+ep  4580 | phase=C | rev=$156.85 | vio= 20 | buf=30000 | alpha=0.0934 | t=7169s
+ep  4590 | phase=C | rev=$273.66 | vio= 20 | buf=30000 | alpha=0.0945 | t=7187s
+ep  4600 | phase=C | rev=$502.10 | vio= 18 | buf=30000 | alpha=0.0920 | t=7205s
+  [EVAL] ep  4600 | val=$262.55/day | phase=C | best=$370.71 | t=7206s
+ep  4610 | phase=C | rev=$281.79 | vio= 16 | buf=30000 | alpha=0.0888 | t=7224s
+ep  4620 | phase=C | rev=$225.66 | vio= 10 | buf=30000 | alpha=0.0857 | t=7243s
+ep  4630 | phase=C | rev=$304.10 | vio= 15 | buf=30000 | alpha=0.0829 | t=7261s
+ep  4640 | phase=C | rev=$220.63 | vio= 11 | buf=30000 | alpha=0.0802 | t=7280s
+ep  4650 | phase=C | rev=$134.54 | vio=  5 | buf=30000 | alpha=0.0776 | t=7298s
+  [EVAL] ep  4650 | val=$130.18/day | phase=C | best=$370.71 | t=7299s
+ep  4660 | phase=C | rev=$329.03 | vio= 10 | buf=30000 | alpha=0.0751 | t=7317s
+ep  4670 | phase=C | rev=$133.26 | vio=  3 | buf=30000 | alpha=0.0727 | t=7335s
+ep  4680 | phase=C | rev=$1899.54 | vio= 15 | buf=30000 | alpha=0.0704 | t=7352s
+ep  4690 | phase=C | rev=$350.66 | vio= 13 | buf=30000 | alpha=0.0681 | t=7370s
+ep  4700 | phase=C | rev=$189.65 | vio=  8 | buf=30000 | alpha=0.0660 | t=7388s
+  [EVAL] ep  4700 | val=$113.77/day | phase=C | best=$370.71 | t=7389s
+ep  4710 | phase=C | rev=$1940.96 | vio= 14 | buf=30000 | alpha=0.0639 | t=7407s
+ep  4720 | phase=C | rev=$350.68 | vio= 15 | buf=30000 | alpha=0.0619 | t=7424s
+ep  4730 | phase=C | rev=$57.12 | vio=  1 | buf=30000 | alpha=0.0600 | t=7443s
+ep  4740 | phase=C | rev=$218.19 | vio=  5 | buf=30000 | alpha=0.0583 | t=7461s
+ep  4750 | phase=C | rev=$438.21 | vio= 15 | buf=30000 | alpha=0.0567 | t=7480s
+  [EVAL] ep  4750 | val=$88.93/day | phase=C | best=$370.71 | t=7481s
+ep  4760 | phase=C | rev=$167.56 | vio=  4 | buf=30000 | alpha=0.0551 | t=7499s
+ep  4770 | phase=C | rev=$662.30 | vio= 15 | buf=30000 | alpha=0.0533 | t=7518s
+ep  4780 | phase=C | rev=$542.35 | vio= 11 | buf=30000 | alpha=0.0517 | t=7535s
+ep  4790 | phase=C | rev=$101.50 | vio=  1 | buf=30000 | alpha=0.0505 | t=7552s
+ep  4800 | phase=C | rev=$13829.10 | vio= 16 | buf=30000 | alpha=0.0497 | t=7569s
+  [EVAL] ep  4800 | val=$38.75/day | phase=C | best=$370.71 | t=7570s
+[Stage2] ep 4807: violations=109 > 50 (phase=C) — reloading best ckpt + halving actor/critic LRs
+ep  4810 | phase=C | rev=$2215.17 | vio= 21 | buf=30000 | alpha=0.0762 | t=7588s
+ep  4820 | phase=C | rev=$389.98 | vio= 20 | buf=30000 | alpha=0.0793 | t=7605s
+ep  4830 | phase=C | rev=$362.57 | vio= 20 | buf=30000 | alpha=0.0824 | t=7623s
+ep  4840 | phase=C | rev=$2098.65 | vio= 20 | buf=30000 | alpha=0.0854 | t=7641s
+ep  4850 | phase=C | rev=$430.03 | vio= 20 | buf=30000 | alpha=0.0884 | t=7660s
+  [EVAL] ep  4850 | val=$318.04/day | phase=C | best=$370.71 | t=7661s
+ep  4860 | phase=C | rev=$455.90 | vio= 21 | buf=30000 | alpha=0.0914 | t=7680s
+ep  4870 | phase=C | rev=$268.58 | vio= 18 | buf=30000 | alpha=0.0942 | t=7698s
+ep  4880 | phase=C | rev=$556.44 | vio= 18 | buf=30000 | alpha=0.0939 | t=7717s
+ep  4890 | phase=C | rev=$623.73 | vio= 21 | buf=30000 | alpha=0.0907 | t=7735s
+ep  4900 | phase=C | rev=$1787.13 | vio= 18 | buf=30000 | alpha=0.0875 | t=7754s
+  [EVAL] ep  4900 | val=$223.23/day | phase=C | best=$370.71 | t=7755s
+ep  4910 | phase=C | rev=$329.66 | vio= 13 | buf=30000 | alpha=0.0845 | t=7773s
+ep  4920 | phase=C | rev=$123.60 | vio= 11 | buf=30000 | alpha=0.0817 | t=7792s
+ep  4930 | phase=C | rev=$356.85 | vio= 12 | buf=30000 | alpha=0.0790 | t=7810s
+ep  4940 | phase=C | rev=$302.96 | vio=  9 | buf=30000 | alpha=0.0765 | t=7829s
+ep  4950 | phase=C | rev=$220.67 | vio=  8 | buf=30000 | alpha=0.0740 | t=7847s
+  [EVAL] ep  4950 | val=$111.34/day | phase=C | best=$370.71 | t=7849s
+ep  4960 | phase=C | rev=$570.80 | vio= 12 | buf=30000 | alpha=0.0716 | t=7867s
+ep  4970 | phase=C | rev=$39.96 | vio=  0 | buf=30000 | alpha=0.0694 | t=7885s
+ep  4980 | phase=C | rev=$148.15 | vio=  3 | buf=30000 | alpha=0.0672 | t=7904s
+ep  4990 | phase=C | rev=$146.85 | vio=  2 | buf=30000 | alpha=0.0650 | t=7922s
+ep  5000 | phase=C | rev=$8.12 | vio=  0 | buf=30000 | alpha=0.0630 | t=7940s
+  [EVAL] ep  5000 | val=$77.89/day | phase=C | best=$370.71 | t=7942s
+
+[Stage2] Training complete. Best val: $370.71/day | wall time: 7942s
+[Stage2] Best checkpoint: /home/stu9/s7/ss2401/tempdrl/outputs/checkpoints/stage2/best_model_s2.pt
