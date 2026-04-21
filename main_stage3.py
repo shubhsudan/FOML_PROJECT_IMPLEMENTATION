@@ -172,9 +172,13 @@ def main():
                 nobs_b = torch.FloatTensor(np.stack([b[4] for b in batch])).to(device)
                 done_b = torch.FloatTensor(np.array([b[5] for b in batch])).to(device)
 
-                ttfe_feats = ttfe(segs)
-                obs_b[:,  0:64] = ttfe_feats
-                nobs_b[:, 0:64] = ttfe_feats
+                # Detach for SAC update — avoids double-backward through the
+                # shared TTFE graph (sac_agent calls .backward() twice: critic
+                # then actor, both through obs_b which shares the TTFE node)
+                with torch.no_grad():
+                    ttfe_feats_d = ttfe(segs)
+                obs_b[:,  0:64] = ttfe_feats_d
+                nobs_b[:, 0:64] = ttfe_feats_d
 
                 batch_dict = {
                     "obs":      obs_b,
@@ -185,8 +189,18 @@ def main():
                 }
                 agent.update(batch_dict)
 
+                # TTFE fine-tune: separate actor-loss pass with live graph
                 if ttfe_opt is not None:
+                    ttfe_feats_live = ttfe(segs)
+                    obs_live = obs_b.clone().detach()
+                    obs_live[:, 0:64] = ttfe_feats_live
+                    acts_s, log_pi = agent.actor.sample(obs_live)
+                    alpha = agent.log_alpha.exp().detach()
+                    q1 = agent.critic1(obs_live, acts_s)
+                    q2 = agent.critic2(obs_live, acts_s)
+                    ttfe_actor_loss = (alpha * log_pi - torch.min(q1, q2)).mean()
                     ttfe_opt.zero_grad()
+                    ttfe_actor_loss.backward()
                     ttfe_opt.step()
 
         # Eval
