@@ -402,8 +402,9 @@ class BESSEnvStage3:
 
         # CyclicalTime [71:77]
         import pandas as pd
-        if hasattr(self.prices, "index"):
-            ts = self.prices.index[t]
+        idx = self.prices.get("_index")
+        if idx is not None and t < len(idx):
+            ts = pd.Timestamp(idx[t])
         else:
             ts = pd.Timestamp("2025-12-06") + pd.Timedelta(minutes=5 * t)
         h   = ts.hour + ts.minute / 60.0

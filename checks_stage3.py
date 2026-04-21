@@ -45,38 +45,40 @@ print(f"  Degradation cost: ${DEGRADATION_COST}/MWh")
 print("  PASS\n")
 
 # Check 5: Data loads correctly
-print("Check 5: Data loader")
+print("Check 5: Data loader + bridge")
 try:
     from src.data_loader_stage2 import load_stage2_data
-    data = load_stage2_data()
-    print("  Price columns:", list(data["prices"].keys()))
-    print("  Syscond columns:", list(data["syscond"].keys()))
-    print(f"  Train days: {len(data['train_days'])}  "
-          f"Val days: {len(data['val_days'])}  "
-          f"Test days: {len(data['test_days'])}")
+    from src.data_bridge_stage3 import make_stage3_splits
+    raw  = load_stage2_data()
+    data = make_stage3_splits(raw)
     required_price_cols = [
         "rt_lmp", "rt_mcpc_regup", "rt_mcpc_regdn", "rt_mcpc_rrs",
         "rt_mcpc_ecrs", "rt_mcpc_nsrs", "dam_spp", "dam_as_regup",
         "dam_as_regdn", "dam_as_rrs", "dam_as_ecrs", "dam_as_nsrs"
     ]
-    missing = [c for c in required_price_cols if c not in data["prices"]]
+    missing = [c for c in required_price_cols if c not in data["train"]["prices"]]
     if missing:
         print(f"  WARNING: missing price columns: {missing}")
     else:
         print("  All required price columns present")
+    print(f"  Train days: {len(data['train']['days'])}  "
+          f"Val days: {len(data['val']['days'])}  "
+          f"Test days: {len(data['test']['days'])}")
     print("  PASS\n")
 except Exception as e:
     print(f"  FAIL: {e}\n")
+    data = None
 
 # Check 6: DAH sanity
 print("Check 6: DAH baseline sanity")
 try:
     from src.dah_baseline import DAHBaseline
-    prices = data["prices"]
-    rt_arr = np.array(prices["rt_lmp"])
+    prices  = data["train"]["prices"]
+    syscond = data["train"]["syscond"]
+    rt_arr  = np.array(prices["rt_lmp"])
     mu, sig = np.nanmean(rt_arr), np.nanstd(rt_arr)
-    dah = DAHBaseline(prices, data["syscond"], mu + 0.5 * sig, mu - 0.5 * sig)
-    result = dah.run_episode(data["train_days"][0])
+    dah     = DAHBaseline(prices, syscond, mu + 0.5 * sig, mu - 0.5 * sig)
+    result  = dah.run_episode(data["train"]["days"][0])
     print(f"  DAH day 0: total=${result['total_rev']:.2f}  "
           f"spot=${result['rev_spot']:.2f}  "
           f"as=${result['rev_as']:.2f}  "
