@@ -105,22 +105,12 @@ def main():
 
     for ep in range(1, N_EPISODES + 1):
 
-        # Phase transitions
-        if ep == 500:
-            print("Phase B: unfreezing top MHA layer")
-            for p in ttfe.parameters():
-                p.requires_grad_(False)
-            for p in ttfe.mha_layers[-1].parameters():
-                p.requires_grad_(True)
-            ttfe_opt = torch.optim.Adam(
-                filter(lambda p: p.requires_grad, ttfe.parameters()),
-                lr=LR_TTFE
-            )
-        elif ep == 1500:
-            print("Phase C: unfreezing all TTFE parameters")
-            for p in ttfe.parameters():
-                p.requires_grad_(True)
-            ttfe_opt = torch.optim.Adam(ttfe.parameters(), lr=LR_TTFE)
+        # TTFE stays frozen for all 5000 eps in Stage 3.
+        # Stage 2 already converged TTFE; fine-tuning it here caused
+        # severe oscillations because the separate TTFE actor-loss pass
+        # fought the SAC critic update. The actor/critic alone are
+        # sufficient to learn the Stage 3 reward structure (DART, $15
+        # degradation, single ESR dispatch).
 
         # Sample random training day
         ep_start = train_days[np.random.randint(len(train_days))]
@@ -189,19 +179,6 @@ def main():
                 }
                 agent.update(batch_dict)
 
-                # TTFE fine-tune: separate actor-loss pass with live graph
-                if ttfe_opt is not None:
-                    ttfe_feats_live = ttfe(segs)
-                    obs_live = obs_b.clone().detach()
-                    obs_live[:, 0:64] = ttfe_feats_live
-                    acts_s, log_pi = agent.actor.sample(obs_live)
-                    alpha = agent.log_alpha.exp().detach()
-                    q1 = agent.critic1(obs_live, acts_s)
-                    q2 = agent.critic2(obs_live, acts_s)
-                    ttfe_actor_loss = (alpha * log_pi - torch.min(q1, q2)).mean()
-                    ttfe_opt.zero_grad()
-                    ttfe_actor_loss.backward()
-                    ttfe_opt.step()
 
         # Eval
         if ep % EVAL_EVERY == 0:
