@@ -263,7 +263,7 @@ def main():
                         pg["lr"] *= 0.5
                     for pg in agent.critic2_optimizer.param_groups:
                         pg["lr"] *= 0.5
-                    divergence_cooldown = 50
+                    divergence_cooldown = 5   # 5 eval periods = ~250 episodes
 
     print(f"\nTraining complete. Best val: ${best_val:.2f}/day")
     print("Run evaluate_stage3.py for test set results.")
