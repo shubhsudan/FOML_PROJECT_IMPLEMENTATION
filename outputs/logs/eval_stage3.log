@@ -1,0 +1,26 @@
+[DataLoaderS2] Total rows loaded: 127,825  (post-RTC+B: 30,481)
+[DataLoaderS2] Post-RTC+B complete days: 100  (train=70, val=15, test=15)
+[DataLoaderS2] Date range: 2025-12-06 → 2026-03-21
+DAH thresholds: discharge=$96.68  charge=$-12.52
+  Day   1: TempDRL=$ 241.66  DAH=$ 223.62  ratio=1.08x
+  Day   2: TempDRL=$ 217.44  DAH=$ 223.62  ratio=0.97x
+  Day   3: TempDRL=$ 160.04  DAH=$ 223.62  ratio=0.72x
+  Day   4: TempDRL=$ 128.27  DAH=$ 223.62  ratio=0.57x
+  Day   5: TempDRL=$ 162.02  DAH=$ 223.62  ratio=0.72x
+  Day   6: TempDRL=$ 159.29  DAH=$ 223.62  ratio=0.71x
+  Day   7: TempDRL=$ 146.95  DAH=$ 223.62  ratio=0.66x
+  Day   8: TempDRL=$ 194.30  DAH=$ 223.62  ratio=0.87x
+  Day   9: TempDRL=$ 165.52  DAH=$ 223.62  ratio=0.74x
+  Day  10: TempDRL=$ 174.80  DAH=$ 223.62  ratio=0.78x
+  Day  11: TempDRL=$  31.90  DAH=$ 223.62  ratio=0.14x
+  Day  12: TempDRL=$ 153.88  DAH=$ 223.62  ratio=0.69x
+  Day  13: TempDRL=$ 131.74  DAH=$ 223.62  ratio=0.59x
+  Day  14: TempDRL=$ 140.48  DAH=$ 223.62  ratio=0.63x
+  Day  15: TempDRL=$  53.72  DAH=$ 223.62  ratio=0.24x
+
+=== Stage 3 Evaluation Summary ===
+  Test days:        15
+  TempDRL mean/day: $150.80  (std $51.79)
+  DAH mean/day:     $223.62  (std $0.00)
+  TempDRL vs DAH:   67.4%
+  Results saved to: outputs/logs/stage3_revenue_results.csv

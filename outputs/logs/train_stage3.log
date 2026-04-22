@@ -1,0 +1,119 @@
+[DataLoaderS2] Total rows loaded: 127,825  (post-RTC+B: 30,481)
+[DataLoaderS2] Post-RTC+B complete days: 100  (train=70, val=15, test=15)
+[DataLoaderS2] Date range: 2025-12-06 → 2026-03-21
+DAH thresholds: discharge=$96.68  charge=$-12.52
+Actor/critic weight load failed (Error(s) in loading state_dict for Actor:
+	size mismatch for trunk.0.weight: copying a param with shape torch.Size([512, 78]) from checkpoint, the shape in current model is torch.Size([512, 88]).
+	size mismatch for mean_head.weight: copying a param with shape torch.Size([9, 512]) from checkpoint, the shape in current model is torch.Size([6, 512]).
+	size mismatch for mean_head.bias: copying a param with shape torch.Size([9]) from checkpoint, the shape in current model is torch.Size([6]).
+	size mismatch for log_std_head.weight: copying a param with shape torch.Size([9, 512]) from checkpoint, the shape in current model is torch.Size([6, 512]).
+	size mismatch for log_std_head.bias: copying a param with shape torch.Size([9]) from checkpoint, the shape in current model is torch.Size([6]).), starting fresh
+Reset log_alpha to -2.996
+Seeding best_val from existing checkpoint: $154.96/day
+[Ep    50] val_rl=$119.51  val_dah=$223.95  ratio=53.4%  ep_reward=121.6
+[Ep   100] val_rl=$103.39  val_dah=$223.95  ratio=46.2%  ep_reward=235.2
+[Ep   150] val_rl=$124.71  val_dah=$223.95  ratio=55.7%  ep_reward=164.3
+[Ep   200] val_rl=$102.17  val_dah=$223.95  ratio=45.6%  ep_reward=39.7
+[Ep   250] val_rl=$113.36  val_dah=$223.95  ratio=50.6%  ep_reward=176.7
+[Ep   300] val_rl=$45.76  val_dah=$223.95  ratio=20.4%  ep_reward=170.1
+  !! Divergence guard (soft): reloading best checkpoint (best=$154.96, cur=$45.76)
+[Ep   350] val_rl=$129.27  val_dah=$223.95  ratio=57.7%  ep_reward=106.6
+[Ep   400] val_rl=$138.49  val_dah=$223.95  ratio=61.8%  ep_reward=123.5
+[Ep   450] val_rl=$131.20  val_dah=$223.95  ratio=58.6%  ep_reward=167.4
+[Ep   500] val_rl=$101.08  val_dah=$223.95  ratio=45.1%  ep_reward=239.6
+[Ep   550] val_rl=$77.09  val_dah=$223.95  ratio=34.4%  ep_reward=196.9
+  !! Divergence guard (soft): reloading best checkpoint (best=$154.96, cur=$77.09)
+[Ep   600] val_rl=$149.09  val_dah=$223.95  ratio=66.6%  ep_reward=103.4
+[Ep   650] val_rl=$130.29  val_dah=$223.95  ratio=58.2%  ep_reward=158.2
+[Ep   700] val_rl=$112.36  val_dah=$223.95  ratio=50.2%  ep_reward=199.4
+[Ep   750] val_rl=$91.27  val_dah=$223.95  ratio=40.8%  ep_reward=196.7
+[Ep   800] val_rl=$118.44  val_dah=$223.95  ratio=52.9%  ep_reward=235.3
+[Ep   850] val_rl=$168.18  val_dah=$223.95  ratio=75.1%  ep_reward=205.8
+  >> New best: $168.18/day saved
+[Ep   900] val_rl=$147.97  val_dah=$223.95  ratio=66.1%  ep_reward=132.4
+[Ep   950] val_rl=$143.13  val_dah=$223.95  ratio=63.9%  ep_reward=798.6
+[Ep  1000] val_rl=$114.42  val_dah=$223.95  ratio=51.1%  ep_reward=198.6
+[Ep  1050] val_rl=$118.23  val_dah=$223.95  ratio=52.8%  ep_reward=785.8
+[Ep  1100] val_rl=$156.28  val_dah=$223.95  ratio=69.8%  ep_reward=139.3
+[Ep  1150] val_rl=$159.42  val_dah=$223.95  ratio=71.2%  ep_reward=1414.3
+[Ep  1200] val_rl=$130.47  val_dah=$223.95  ratio=58.3%  ep_reward=196.1
+[Ep  1250] val_rl=$138.52  val_dah=$223.95  ratio=61.9%  ep_reward=148.3
+[Ep  1300] val_rl=$141.50  val_dah=$223.95  ratio=63.2%  ep_reward=115.9
+[Ep  1350] val_rl=$146.87  val_dah=$223.95  ratio=65.6%  ep_reward=135.4
+[Ep  1400] val_rl=$124.33  val_dah=$223.95  ratio=55.5%  ep_reward=81.1
+[Ep  1450] val_rl=$135.11  val_dah=$223.95  ratio=60.3%  ep_reward=150.1
+Ep 1500: halving LR and reducing entropy for exploitation phase
+[Ep  1500] val_rl=$121.84  val_dah=$223.95  ratio=54.4%  ep_reward=152.2
+[Ep  1550] val_rl=$122.61  val_dah=$223.95  ratio=54.7%  ep_reward=160.0
+[Ep  1600] val_rl=$121.56  val_dah=$223.95  ratio=54.3%  ep_reward=689.3
+[Ep  1650] val_rl=$137.19  val_dah=$223.95  ratio=61.3%  ep_reward=152.5
+[Ep  1700] val_rl=$143.23  val_dah=$223.95  ratio=64.0%  ep_reward=129.0
+[Ep  1750] val_rl=$147.32  val_dah=$223.95  ratio=65.8%  ep_reward=192.8
+[Ep  1800] val_rl=$141.29  val_dah=$223.95  ratio=63.1%  ep_reward=195.3
+[Ep  1850] val_rl=$133.28  val_dah=$223.95  ratio=59.5%  ep_reward=250.6
+[Ep  1900] val_rl=$137.65  val_dah=$223.95  ratio=61.5%  ep_reward=191.2
+[Ep  1950] val_rl=$131.18  val_dah=$223.95  ratio=58.6%  ep_reward=131.3
+[Ep  2000] val_rl=$135.35  val_dah=$223.95  ratio=60.4%  ep_reward=140.0
+[Ep  2050] val_rl=$129.95  val_dah=$223.95  ratio=58.0%  ep_reward=289.0
+[Ep  2100] val_rl=$127.26  val_dah=$223.95  ratio=56.8%  ep_reward=128.8
+[Ep  2150] val_rl=$124.73  val_dah=$223.95  ratio=55.7%  ep_reward=248.1
+[Ep  2200] val_rl=$115.40  val_dah=$223.95  ratio=51.5%  ep_reward=182.9
+[Ep  2250] val_rl=$127.97  val_dah=$223.95  ratio=57.1%  ep_reward=94.9
+[Ep  2300] val_rl=$131.14  val_dah=$223.95  ratio=58.6%  ep_reward=159.3
+[Ep  2350] val_rl=$130.44  val_dah=$223.95  ratio=58.2%  ep_reward=101.9
+[Ep  2400] val_rl=$129.14  val_dah=$223.95  ratio=57.7%  ep_reward=235.9
+[Ep  2450] val_rl=$128.56  val_dah=$223.95  ratio=57.4%  ep_reward=490.6
+[Ep  2500] val_rl=$128.46  val_dah=$223.95  ratio=57.4%  ep_reward=99.3
+[Ep  2550] val_rl=$122.56  val_dah=$223.95  ratio=54.7%  ep_reward=150.0
+[Ep  2600] val_rl=$122.41  val_dah=$223.95  ratio=54.7%  ep_reward=124.6
+[Ep  2650] val_rl=$119.52  val_dah=$223.95  ratio=53.4%  ep_reward=121.1
+[Ep  2700] val_rl=$117.83  val_dah=$223.95  ratio=52.6%  ep_reward=132.2
+[Ep  2750] val_rl=$121.07  val_dah=$223.95  ratio=54.1%  ep_reward=219.7
+[Ep  2800] val_rl=$121.06  val_dah=$223.95  ratio=54.1%  ep_reward=183.2
+[Ep  2850] val_rl=$121.83  val_dah=$223.95  ratio=54.4%  ep_reward=77.8
+[Ep  2900] val_rl=$123.44  val_dah=$223.95  ratio=55.1%  ep_reward=158.7
+[Ep  2950] val_rl=$126.03  val_dah=$223.95  ratio=56.3%  ep_reward=206.2
+[Ep  3000] val_rl=$128.96  val_dah=$223.95  ratio=57.6%  ep_reward=207.6
+[Ep  3050] val_rl=$127.01  val_dah=$223.95  ratio=56.7%  ep_reward=221.2
+[Ep  3100] val_rl=$125.76  val_dah=$223.95  ratio=56.2%  ep_reward=167.6
+[Ep  3150] val_rl=$121.70  val_dah=$223.95  ratio=54.3%  ep_reward=265.3
+[Ep  3200] val_rl=$121.14  val_dah=$223.95  ratio=54.1%  ep_reward=317.3
+[Ep  3250] val_rl=$124.98  val_dah=$223.95  ratio=55.8%  ep_reward=144.6
+[Ep  3300] val_rl=$121.73  val_dah=$223.95  ratio=54.4%  ep_reward=203.0
+[Ep  3350] val_rl=$122.74  val_dah=$223.95  ratio=54.8%  ep_reward=173.1
+[Ep  3400] val_rl=$122.04  val_dah=$223.95  ratio=54.5%  ep_reward=119.3
+[Ep  3450] val_rl=$124.08  val_dah=$223.95  ratio=55.4%  ep_reward=233.8
+[Ep  3500] val_rl=$123.18  val_dah=$223.95  ratio=55.0%  ep_reward=255.0
+[Ep  3550] val_rl=$127.43  val_dah=$223.95  ratio=56.9%  ep_reward=214.2
+[Ep  3600] val_rl=$127.41  val_dah=$223.95  ratio=56.9%  ep_reward=1398.6
+[Ep  3650] val_rl=$127.28  val_dah=$223.95  ratio=56.8%  ep_reward=178.8
+[Ep  3700] val_rl=$128.78  val_dah=$223.95  ratio=57.5%  ep_reward=134.0
+[Ep  3750] val_rl=$132.16  val_dah=$223.95  ratio=59.0%  ep_reward=131.6
+[Ep  3800] val_rl=$127.81  val_dah=$223.95  ratio=57.1%  ep_reward=142.4
+[Ep  3850] val_rl=$127.83  val_dah=$223.95  ratio=57.1%  ep_reward=133.5
+[Ep  3900] val_rl=$127.25  val_dah=$223.95  ratio=56.8%  ep_reward=531.6
+[Ep  3950] val_rl=$123.28  val_dah=$223.95  ratio=55.0%  ep_reward=217.0
+[Ep  4000] val_rl=$126.36  val_dah=$223.95  ratio=56.4%  ep_reward=186.6
+[Ep  4050] val_rl=$129.61  val_dah=$223.95  ratio=57.9%  ep_reward=212.0
+[Ep  4100] val_rl=$125.97  val_dah=$223.95  ratio=56.2%  ep_reward=176.0
+[Ep  4150] val_rl=$123.97  val_dah=$223.95  ratio=55.4%  ep_reward=657.8
+[Ep  4200] val_rl=$124.21  val_dah=$223.95  ratio=55.5%  ep_reward=107.0
+[Ep  4250] val_rl=$129.01  val_dah=$223.95  ratio=57.6%  ep_reward=117.1
+[Ep  4300] val_rl=$125.92  val_dah=$223.95  ratio=56.2%  ep_reward=143.9
+[Ep  4350] val_rl=$129.00  val_dah=$223.95  ratio=57.6%  ep_reward=684.5
+[Ep  4400] val_rl=$124.37  val_dah=$223.95  ratio=55.5%  ep_reward=191.2
+[Ep  4450] val_rl=$131.60  val_dah=$223.95  ratio=58.8%  ep_reward=129.2
+[Ep  4500] val_rl=$133.33  val_dah=$223.95  ratio=59.5%  ep_reward=168.9
+[Ep  4550] val_rl=$133.24  val_dah=$223.95  ratio=59.5%  ep_reward=157.7
+[Ep  4600] val_rl=$133.66  val_dah=$223.95  ratio=59.7%  ep_reward=188.0
+[Ep  4650] val_rl=$134.09  val_dah=$223.95  ratio=59.9%  ep_reward=144.7
+[Ep  4700] val_rl=$133.80  val_dah=$223.95  ratio=59.7%  ep_reward=121.9
+[Ep  4750] val_rl=$130.00  val_dah=$223.95  ratio=58.0%  ep_reward=151.0
+[Ep  4800] val_rl=$131.29  val_dah=$223.95  ratio=58.6%  ep_reward=183.4
+[Ep  4850] val_rl=$131.68  val_dah=$223.95  ratio=58.8%  ep_reward=186.8
+[Ep  4900] val_rl=$135.42  val_dah=$223.95  ratio=60.5%  ep_reward=175.0
+[Ep  4950] val_rl=$138.32  val_dah=$223.95  ratio=61.8%  ep_reward=178.8
+[Ep  5000] val_rl=$136.07  val_dah=$223.95  ratio=60.8%  ep_reward=309.1
+
+Training complete. Best val: $168.18/day
+Run evaluate_stage3.py for test set results.
