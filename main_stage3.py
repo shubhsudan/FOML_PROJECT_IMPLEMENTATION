@@ -240,13 +240,18 @@ def main():
                 }, os.path.join(STAGE3_DIR, "best_model_s3.pt"))
                 print(f"  >> New best: ${best_val:.2f}/day saved")
 
-            # Divergence guard
+            # Divergence guard — two triggers:
+            #   hard: mean_rl < -50 (catastrophic collapse)
+            #   soft: mean_rl < best_val * 0.65 (sustained drift > 35% below best)
             if divergence_cooldown > 0:
                 divergence_cooldown -= 1
-            if mean_rl < -50 and divergence_cooldown == 0:
+            soft_trigger = (best_val > 50 and mean_rl < best_val * 0.65)
+            hard_trigger = (mean_rl < -50)
+            if (hard_trigger or soft_trigger) and divergence_cooldown == 0:
+                trigger_label = "hard" if hard_trigger else "soft"
                 best_path = os.path.join(STAGE3_DIR, "best_model_s3.pt")
                 if os.path.exists(best_path):
-                    print("  !! Divergence guard: reloading best checkpoint")
+                    print(f"  !! Divergence guard ({trigger_label}): reloading best checkpoint (best=${best_val:.2f}, cur=${mean_rl:.2f})")
                     ckpt = torch.load(best_path, map_location=device, weights_only=False)
                     ttfe.load_state_dict(ckpt["ttfe_state"])
                     agent.actor.load_state_dict(ckpt["actor"])
