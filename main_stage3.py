@@ -90,7 +90,17 @@ def main():
     # Phase C (ep 1500–5000): all TTFE, LR=1e-5
 
     replay_buffer = []
-    best_val      = -1e9
+    # Seed best_val from existing checkpoint so restarts never overwrite a better result
+    _existing = os.path.join(STAGE3_DIR, "best_model_s3.pt")
+    if os.path.exists(_existing):
+        try:
+            _ck = torch.load(_existing, map_location="cpu", weights_only=False)
+            best_val = float(_ck.get("val_rl", -1e9))
+            print(f"Seeding best_val from existing checkpoint: ${best_val:.2f}/day")
+        except Exception:
+            best_val = -1e9
+    else:
+        best_val = -1e9
     ttfe_opt      = None
 
     env_train = BESSEnvStage3(train_prices, train_syscond, ttfe, device)
